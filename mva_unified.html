@@ -185,11 +185,27 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
 .card-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;display:flex;justify-content:center;align-items:center;text-align:center}
 .prog-bg{background:var(--bg3);border-radius:4px;height:5px;margin-top:3px}
 .prog-bar{height:5px;border-radius:4px;background:var(--green);transition:width .6s}
-.report-box{background:var(--gold-l);border:1px solid var(--amber-b);border-radius:var(--rl2);padding:13px 15px}
-.rpt-title{font-family:var(--mono);font-size:10px;color:var(--gold-d);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px;text-align:center}
-.rstat{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--amber-b)}
+.report-box{background:linear-gradient(160deg,#0a1628 0%,#1a2d4a 100%);border:1px solid rgba(201,168,76,.35);border-radius:var(--rl2);padding:14px 15px;overflow:hidden;position:relative}
+.report-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),#f0c040,var(--gold))}
+.rpt-title{font-family:var(--mono);font-size:9px;color:rgba(201,168,76,.7);text-transform:uppercase;letter-spacing:.14em;margin-bottom:3px;text-align:center}
+.rpt-subtitle{font-size:11px;font-weight:700;color:white;text-align:center;margin-bottom:10px;line-height:1.3}
+/* Highlight metrics inside report */
+.rpt-highlights{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+.rpt-hl{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 10px;text-align:center}
+.rpt-hl.wellness{background:rgba(109,40,217,.2);border-color:rgba(196,181,253,.3)}
+.rpt-hl.env{background:rgba(10,124,92,.18);border-color:rgba(157,214,190,.3)}
+.rpt-hl.dollar{background:rgba(201,168,76,.15);border-color:rgba(201,168,76,.35)}
+.rpt-hl.gov{background:rgba(26,58,107,.4);border-color:rgba(180,200,248,.2)}
+.rpt-hl-val{font-family:var(--mono);font-size:19px;font-weight:700;line-height:1;margin-bottom:2px}
+.rpt-hl.wellness .rpt-hl-val{color:#c4b5fd}
+.rpt-hl.env .rpt-hl-val{color:#9dd6be}
+.rpt-hl.dollar .rpt-hl-val{color:var(--gold)}
+.rpt-hl.gov .rpt-hl-val{color:#b4c8f8}
+.rpt-hl-lbl{font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.1em;opacity:.65;color:white}
+/* Detail rows */
+.rstat{display:flex;justify-content:space-between;font-size:11px;padding:3.5px 0;border-bottom:1px solid rgba(255,255,255,.07)}
 .rstat:last-child{border-bottom:none}
-.rstat-l{color:var(--text2)}.rstat-v{font-family:var(--mono);font-weight:600;color:var(--text)}
+.rstat-l{color:rgba(255,255,255,.55)}.rstat-v{font-family:var(--mono);font-weight:600;color:rgba(255,255,255,.9)}
 
 /* TABLE */
 .card table{width:100%;border-collapse:collapse}
@@ -672,12 +688,32 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
         <div class="card"><div class="card-title">By Type</div><div id="jiv-type-chart"><div style="color:var(--text3);font-family:var(--mono);font-size:12px">No data yet</div></div></div>
         <div class="card"><div class="card-title">By Court <span id="jiv-view-lbl" style="font-weight:400;font-size:10px;color:var(--text3)">Your entries</span></div><div id="jiv-court-chart"><div style="color:var(--text3);font-family:var(--mono);font-size:12px">No data yet</div></div></div>
         <div class="report-box">
-          <div class="rpt-title">Board - JCOD Report</div>
-          <div class="rstat"><span class="rstat-l">Period</span><span class="rstat-v" id="jiv-rpt-period">--</span></div>
-          <div class="rstat"><span class="rstat-l">Interactions</span><span class="rstat-v" id="jiv-rpt-count">0</span></div>
-          <div class="rstat"><span class="rstat-l">Hours Saved</span><span class="rstat-v" id="jiv-rpt-hours">0.0</span></div>
-          <div class="rstat"><span class="rstat-l">Token Reduction</span><span class="rstat-v" id="jiv-rpt-pct">0%</span></div>
-          <div style="margin-top:9px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
+          <div class="rpt-title">LA County Board of Supervisors &amp; Grant Funders</div>
+          <div class="rpt-subtitle">JIV · AI-Governed Veterans Impact Report</div>
+          <div class="rpt-highlights">
+            <div class="rpt-hl wellness">
+              <div class="rpt-hl-val" id="jiv-rpt-wellness">0</div>
+              <div class="rpt-hl-lbl">Veteran Wellness Seconds</div>
+            </div>
+            <div class="rpt-hl dollar">
+              <div class="rpt-hl-val" id="jiv-rpt-dollars">$0</div>
+              <div class="rpt-hl-lbl">Dollars Saved</div>
+            </div>
+            <div class="rpt-hl env">
+              <div class="rpt-hl-val" id="jiv-rpt-co2">0mg</div>
+              <div class="rpt-hl-lbl">CO₂ Reduced</div>
+            </div>
+            <div class="rpt-hl gov">
+              <div class="rpt-hl-val" id="jiv-rpt-pct">0%</div>
+              <div class="rpt-hl-lbl">Governed AI Rate</div>
+            </div>
+          </div>
+          <div class="rstat"><span class="rstat-l">Reporting Period</span><span class="rstat-v" id="jiv-rpt-period">--</span></div>
+          <div class="rstat"><span class="rstat-l">AI-Assisted Interactions</span><span class="rstat-v" id="jiv-rpt-count">0</span></div>
+          <div class="rstat"><span class="rstat-l">Hours Returned to Veterans</span><span class="rstat-v" id="jiv-rpt-hours">0.0 hrs</span></div>
+          <div class="rstat"><span class="rstat-l">Energy Saved</span><span class="rstat-v" id="jiv-rpt-energy">0 mWh</span></div>
+          <div class="rstat"><span class="rstat-l">Water Conserved</span><span class="rstat-v" id="jiv-rpt-water">0 mL</span></div>
+          <div style="margin-top:10px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
         </div>
       </div>
       <div class="card">
@@ -794,13 +830,33 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
         <div class="card"><div class="card-title">By Type</div><div id="vet-type-chart"><div style="color:var(--text3);font-family:var(--mono);font-size:12px">No data yet</div></div></div>
         <div class="card"><div class="card-title">By Location <span id="vet-view-lbl" style="font-weight:400;font-size:10px;color:var(--text3)">Your entries</span></div><div id="vet-court-chart"><div style="color:var(--text3);font-family:var(--mono);font-size:12px">No data yet</div></div></div>
         <div class="report-box">
-          <div class="rpt-title">Board - JCOD Report</div>
-          <div class="rstat"><span class="rstat-l">Period</span><span class="rstat-v" id="vet-rpt-period">--</span></div>
-          <div class="rstat"><span class="rstat-l">Total</span><span class="rstat-v" id="vet-rpt-count">0</span></div>
-          <div class="rstat"><span class="rstat-l">JIV / Non-JIV</span><span class="rstat-v" id="vet-rpt-split">0 / 0</span></div>
-          <div class="rstat"><span class="rstat-l">Wellness Seconds</span><span class="rstat-v" id="vet-rpt-wellness">0</span></div>
-          <div class="rstat"><span class="rstat-l">Token Reduction</span><span class="rstat-v" id="vet-rpt-pct">0%</span></div>
-          <div style="margin-top:9px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
+          <div class="rpt-title">LA County Board of Supervisors &amp; Grant Funders</div>
+          <div class="rpt-subtitle">Veteran Services · AI-Governed Impact Report</div>
+          <div class="rpt-highlights">
+            <div class="rpt-hl wellness">
+              <div class="rpt-hl-val" id="vet-rpt-wellness">0</div>
+              <div class="rpt-hl-lbl">Veteran Wellness Seconds</div>
+            </div>
+            <div class="rpt-hl dollar">
+              <div class="rpt-hl-val" id="vet-rpt-dollars">$0</div>
+              <div class="rpt-hl-lbl">Dollars Saved</div>
+            </div>
+            <div class="rpt-hl env">
+              <div class="rpt-hl-val" id="vet-rpt-co2">0mg</div>
+              <div class="rpt-hl-lbl">CO₂ Reduced</div>
+            </div>
+            <div class="rpt-hl gov">
+              <div class="rpt-hl-val" id="vet-rpt-pct">0%</div>
+              <div class="rpt-hl-lbl">Governed AI Rate</div>
+            </div>
+          </div>
+          <div class="rstat"><span class="rstat-l">Reporting Period</span><span class="rstat-v" id="vet-rpt-period">--</span></div>
+          <div class="rstat"><span class="rstat-l">AI-Assisted Interactions</span><span class="rstat-v" id="vet-rpt-count">0</span></div>
+          <div class="rstat"><span class="rstat-l">JIV / Non-JIV Split</span><span class="rstat-v" id="vet-rpt-split">0 / 0</span></div>
+          <div class="rstat"><span class="rstat-l">Hours Returned to Veterans</span><span class="rstat-v" id="vet-rpt-hours">0.0 hrs</span></div>
+          <div class="rstat"><span class="rstat-l">Energy Saved</span><span class="rstat-v" id="vet-rpt-energy">0 mWh</span></div>
+          <div class="rstat"><span class="rstat-l">Water Conserved</span><span class="rstat-v" id="vet-rpt-water">0 mL</span></div>
+          <div style="margin-top:10px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
         </div>
       </div>
       <div class="card">
@@ -1427,10 +1483,16 @@ function refreshLog(r) {
     document.getElementById('jiv-sv-water').textContent = water.toFixed(1);
     document.getElementById('jiv-sv-co2').textContent = co2.toFixed(2);
     document.getElementById('jiv-sv-pct').textContent = avgPct + '%';
+    var dollarsJiv = (totalSaved * 0.000003 * 500).toFixed(0);
     document.getElementById('jiv-rpt-period').textContent = period;
     document.getElementById('jiv-rpt-count').textContent = total;
     document.getElementById('jiv-rpt-hours').textContent = hours + ' hrs';
     document.getElementById('jiv-rpt-pct').textContent = avgPct + '%';
+    document.getElementById('jiv-rpt-wellness').textContent = totalW.toLocaleString();
+    document.getElementById('jiv-rpt-dollars').textContent = '$' + Number(dollarsJiv).toLocaleString();
+    document.getElementById('jiv-rpt-energy').textContent = energy.toFixed(1) + ' mWh';
+    document.getElementById('jiv-rpt-water').textContent = water.toFixed(1) + ' mL';
+    document.getElementById('jiv-rpt-co2').textContent = co2.toFixed(1) + 'mg';
     renderCharts('jiv', log);
     renderTable('jiv', log, 'jiv-log-body', false);
   }
@@ -1448,11 +1510,17 @@ function refreshLog(r) {
     document.getElementById('vet-sv-water').textContent = water.toFixed(1);
     document.getElementById('vet-sv-co2').textContent = co2.toFixed(2);
     document.getElementById('vet-sv-pct').textContent = avgPct + '%';
+    var dollarsVet = (totalSaved * 0.000003 * 500).toFixed(0);
     document.getElementById('vet-rpt-period').textContent = period;
     document.getElementById('vet-rpt-count').textContent = total;
     document.getElementById('vet-rpt-split').textContent = jivC + ' / ' + (total - jivC);
-    document.getElementById('vet-rpt-wellness').textContent = totalW.toLocaleString() + ' sec';
+    document.getElementById('vet-rpt-wellness').textContent = totalW.toLocaleString();
     document.getElementById('vet-rpt-pct').textContent = avgPct + '%';
+    document.getElementById('vet-rpt-dollars').textContent = '$' + Number(dollarsVet).toLocaleString();
+    document.getElementById('vet-rpt-energy').textContent = energy.toFixed(1) + ' mWh';
+    document.getElementById('vet-rpt-water').textContent = water.toFixed(1) + ' mL';
+    document.getElementById('vet-rpt-co2').textContent = co2.toFixed(1) + 'mg';
+    document.getElementById('vet-rpt-hours').textContent = hours + ' hrs';
     renderCharts('vet', log);
     renderTable('vet', log, 'vet-log-body', true);
   }
