@@ -288,6 +288,7 @@ app.get("/demo2", (req, res) => { res.sendFile(join(__dirname, "igm_demo_v2.html
 app.get("/tracker", (req, res) => { res.sendFile(join(__dirname, "mva_igm_tracker.html")); });
 app.get("/jiv", (req, res) => { res.sendFile(join(__dirname, "mva_jiv_log.html")); });
 app.get("/intake", (req, res) => { res.sendFile(join(__dirname, "vtc_intake_form.html")); });
+app.get("/vetlog", (req, res) => { res.sendFile(join(__dirname, "mva_vet_services_log.html")); });
 
 // ── Health check ───────────────────────────────────────────
 app.post("/log/ungoverned", async (req, res) => {
