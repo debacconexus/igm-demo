@@ -2,9 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
 <title>MVA Veteran Services | LA County</title>
+
+<!-- PWA: installable on any device -->
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#0a1628"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MVA Veterans"/>
+<meta name="application-name" content="MVA Veterans"/>
+<meta name="msapplication-TileColor" content="#0a1628"/>
+<meta name="msapplication-TileImage" content="/icons/icon-144.png"/>
+
+<!-- App icons for every platform -->
+<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"/>
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png"/>
+
+<!-- Description for search/share -->
+<meta name="description" content="Military & Veterans Affairs – LA County veteran services portal"/>
+<meta name="og:title" content="MVA Veteran Services | LA County"/>
+<meta name="og:description" content="LA County veteran services portal"/>
+<meta name="og:image" content="/icons/icon-512.png"/>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+
+<!-- Service Worker registration -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('MVA SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
 <style>
 :root{
   --navy:#0a1628;--navy2:#1a2d4a;
