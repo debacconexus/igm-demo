@@ -64,6 +64,14 @@ app.get("/jiv", (req, res) => {
   res.sendFile(join(__dirname, "mva_jiv_log.html"));
 });
 
+app.get("/intake", (req, res) => {
+  res.sendFile(join(__dirname, "vtc_intake_form.html"));
+});
+
+app.get("/intake", (req, res) => {
+  res.sendFile(join(__dirname, "vtc_intake_form.html"));
+});
+
 // ── Health check ───────────────────────────────────────────
 // ── Log ungoverned inference ───────────────────────────────
 app.post("/log/ungoverned", async (req, res) => {
