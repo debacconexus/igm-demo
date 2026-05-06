@@ -60,6 +60,10 @@ app.get("/tracker", (req, res) => {
   res.sendFile(join(__dirname, "mva_igm_tracker.html"));
 });
 
+app.get("/jiv", (req, res) => {
+  res.sendFile(join(__dirname, "mva_jiv_log.html"));
+});
+
 // ── Health check ───────────────────────────────────────────
 // ── Log ungoverned inference ───────────────────────────────
 app.post("/log/ungoverned", async (req, res) => {
