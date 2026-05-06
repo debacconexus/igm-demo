@@ -1,7 +1,7 @@
 // ======================================
 // IGM — Inference Governance Module
 // Anthropic Proxy + IGM Pipeline Proxy
-// + MVA-JIV Shared Database
+// + MVA-JIV JSON File Storage
 // DeBacco Nexus LLC | USPTO 19/571,156
 // ======================================
 
@@ -9,10 +9,7 @@ import express from "express";
 import fetch from "node-fetch";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const Database = require("better-sqlite3");
+import { readFileSync, writeFileSync, existsSync } from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,235 +27,119 @@ console.log("[IGM] ANTHROPIC_API_KEY present:", !!ANTHROPIC_API_KEY);
 console.log("[IGM] IGM_PIPELINE_URL present:", !!IGM_PIPELINE_URL);
 console.log("[IGM] IGM_LIVE_KEY present:", !!IGM_LIVE_KEY);
 
-// ── MVA-JIV SQLite Database ────────────────────────────────
-const db = new Database(join(__dirname, "mva_jiv.db"));
+// ── MVA-JIV JSON Storage ───────────────────────────────────
+const DB_PATH = join(__dirname, "mva_jiv_data.json");
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS jiv_interactions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    staff TEXT NOT NULL,
-    title TEXT,
-    type TEXT,
-    court TEXT,
-    ungov INTEGER,
-    gov INTEGER,
-    saved INTEGER,
-    pct INTEGER,
-    time_saved INTEGER,
-    notes TEXT,
-    energy TEXT,
-    water TEXT,
-    co2 TEXT,
-    cost TEXT,
-    catalogue_id TEXT,
-    veteran_name TEXT
-  );
+function readDB() {
+  if (!existsSync(DB_PATH)) {
+    const empty = { interactions: [], intakes: [] };
+    writeFileSync(DB_PATH, JSON.stringify(empty));
+    return empty;
+  }
+  try {
+    return JSON.parse(readFileSync(DB_PATH, "utf8"));
+  } catch(e) {
+    return { interactions: [], intakes: [] };
+  }
+}
 
-  CREATE TABLE IF NOT EXISTS jiv_intakes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    staff TEXT,
-    catalogue_id TEXT,
-    last_name TEXT,
-    first_name TEXT,
-    middle_name TEXT,
-    dob TEXT,
-    ssn_last4 TEXT,
-    phone TEXT,
-    email TEXT,
-    address TEXT,
-    city TEXT,
-    state TEXT,
-    zip TEXT,
-    gender TEXT,
-    branch TEXT,
-    component TEXT,
-    svc_from TEXT,
-    svc_to TEXT,
-    discharge TEXT,
-    va_rating TEXT,
-    combat TEXT,
-    mst TEXT,
-    confirmed TEXT,
-    service_connected TEXT,
-    court TEXT,
-    case_number TEXT,
-    next_court_date TEXT,
-    custody TEXT,
-    attorney TEXT,
-    defender TEXT,
-    vjo TEXT,
-    referral TEXT,
-    healthcare TEXT,
-    va_eligible TEXT,
-    needs TEXT,
-    notes TEXT
-  );
-`);
+function writeDB(data) {
+  writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+}
 
-console.log("[IGM] MVA-JIV database initialized");
+console.log("[IGM] MVA-JIV JSON storage initialized");
 
 // ── JIV API: Log interaction ───────────────────────────────
 app.post("/api/jiv/log", (req, res) => {
   try {
-    const e = req.body;
-    const stmt = db.prepare(`
-      INSERT INTO jiv_interactions
-      (timestamp, staff, title, type, court, ungov, gov, saved, pct,
-       time_saved, notes, energy, water, co2, cost, catalogue_id, veteran_name)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    stmt.run(
-      e.timestamp || new Date().toISOString(),
-      e.staff || 'Unknown',
-      e.title || '',
-      e.type || 'other',
-      e.court || '',
-      e.ungov || 0,
-      e.gov || 0,
-      e.saved || 0,
-      e.pct || 0,
-      e.timeSaved || 0,
-      e.notes || '',
-      e.energy || '0',
-      e.water || '0',
-      e.co2 || '0',
-      e.cost || '0',
-      e.catalogueId || '',
-      e.veteranName || ''
-    );
-    res.json({ success: true, id: stmt.run ? db.prepare('SELECT last_insert_rowid() as id').get()?.id : null });
-  } catch (err) {
-    console.error("[JIV] Log error:", err.message);
+    const db = readDB();
+    const entry = { id: Date.now(), ...req.body };
+    db.interactions.unshift(entry);
+    writeDB(db);
+    res.json({ success: true, id: entry.id });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── JIV API: Get all interactions ─────────────────────────
+// ── JIV API: Get interactions ──────────────────────────────
 app.get("/api/jiv/log", (req, res) => {
   try {
+    const db = readDB();
     const staff = req.query.staff;
-    const rows = staff
-      ? db.prepare("SELECT * FROM jiv_interactions WHERE staff = ? ORDER BY timestamp DESC").all(staff)
-      : db.prepare("SELECT * FROM jiv_interactions ORDER BY timestamp DESC").all();
-    res.json({ success: true, interactions: rows });
-  } catch (err) {
+    const interactions = staff
+      ? db.interactions.filter(e => e.staff === staff)
+      : db.interactions;
+    res.json({ success: true, interactions });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── JIV API: Clear interactions ───────────────────────────
+// ── JIV API: Delete interactions ───────────────────────────
 app.delete("/api/jiv/log", (req, res) => {
   try {
+    const db = readDB();
     const staff = req.query.staff;
     if (staff) {
-      db.prepare("DELETE FROM jiv_interactions WHERE staff = ?").run(staff);
+      db.interactions = db.interactions.filter(e => e.staff !== staff);
     } else {
-      db.prepare("DELETE FROM jiv_interactions").run();
+      db.interactions = [];
     }
+    writeDB(db);
     res.json({ success: true });
-  } catch (err) {
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── JIV API: Submit intake ────────────────────────────────
+// ── JIV API: Submit intake ─────────────────────────────────
 app.post("/api/jiv/intake", (req, res) => {
   try {
-    const d = req.body;
-    const stmt = db.prepare(`
-      INSERT INTO jiv_intakes
-      (timestamp, staff, catalogue_id, last_name, first_name, middle_name,
-       dob, ssn_last4, phone, email, address, city, state, zip, gender,
-       branch, component, svc_from, svc_to, discharge, va_rating, combat,
-       mst, confirmed, service_connected, court, case_number, next_court_date,
-       custody, attorney, defender, vjo, referral, healthcare, va_eligible,
-       needs, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    stmt.run(
-      new Date().toISOString(),
-      d.staff || 'Unknown',
-      d.catalogueId || '',
-      d.last || '', d.first || '', d.middle || '',
-      d.dob || '', d.ssn || '', d.phone || '', d.email || '',
-      d.address || '', d.city || '', d.state || '', d.zip || '',
-      d.gender || '', d.branch || '', d.component || '',
-      d.svcFrom || '', d.svcTo || '',
-      d.discharge || '', d.rating || '',
-      d.combat || '', d.mst || '', d.confirmed || '', d.sc || '',
-      d.court || '', d.caseNum || '', d.courtDate || '',
-      d.custody || '', d.attorney || '', d.defender || '',
-      d.vjo || '', d.referral || '', d.healthcare || '', d.vaElig || '',
-      JSON.stringify(d.needs || []),
-      d.notes || ''
-    );
-
-    // Also auto-log as JIV interaction
-    db.prepare(`
-      INSERT INTO jiv_interactions
-      (timestamp, staff, title, type, court, ungov, gov, saved, pct,
-       time_saved, notes, energy, water, co2, cost, catalogue_id, veteran_name)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      new Date().toISOString(),
-      d.staff || 'Unknown',
-      d.staffTitle || '',
-      'intake',
-      d.court || '',
-      480, 150, 330, 69, 15,
-      `Intake: ${d.last}, ${d.first} · Case: ${d.caseNum || 'Pending'}`,
-      '99.0', '165.0', '49.50', '0.00099',
-      d.catalogueId || '',
-      `${d.last}, ${d.first}`
-    );
-
-    res.json({ success: true, catalogueId: d.catalogueId });
-  } catch (err) {
-    console.error("[JIV] Intake error:", err.message);
+    const db = readDB();
+    const entry = { id: Date.now(), timestamp: new Date().toISOString(), ...req.body };
+    db.intakes.unshift(entry);
+    // Also log as interaction
+    db.interactions.unshift({
+      id: Date.now() + 1,
+      timestamp: entry.timestamp,
+      staff: entry.staff || 'Unknown',
+      title: entry.staffTitle || '',
+      type: 'intake',
+      court: entry.court || '',
+      ungov: 480, gov: 150, saved: 330, pct: 69,
+      timeSaved: 15,
+      notes: `Intake: ${entry.last || ''}, ${entry.first || ''} · Case: ${entry.caseNum || 'Pending'}`,
+      energy: '99.0', water: '165.0', co2: '49.50', cost: '0.00099',
+      catalogueId: entry.catalogueId || '',
+      veteranName: `${entry.last || ''}, ${entry.first || ''}`
+    });
+    writeDB(db);
+    res.json({ success: true, catalogueId: entry.catalogueId });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── JIV API: Get all intakes ──────────────────────────────
+// ── JIV API: Get intakes ───────────────────────────────────
 app.get("/api/jiv/intake", (req, res) => {
   try {
-    const rows = db.prepare("SELECT * FROM jiv_intakes ORDER BY timestamp DESC").all();
-    res.json({ success: true, intakes: rows });
-  } catch (err) {
+    const db = readDB();
+    res.json({ success: true, intakes: db.intakes });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── JIV API: Clear intakes ────────────────────────────────
-app.delete("/api/jiv/intake", (req, res) => {
-  try {
-    db.prepare("DELETE FROM jiv_intakes").run();
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ── JIV API: Summary stats ────────────────────────────────
+// ── JIV API: Summary ───────────────────────────────────────
 app.get("/api/jiv/summary", (req, res) => {
   try {
-    const total = db.prepare("SELECT COUNT(*) as count FROM jiv_interactions").get().count;
-    const totalSaved = db.prepare("SELECT SUM(saved) as total FROM jiv_interactions").get().total || 0;
-    const totalTime = db.prepare("SELECT SUM(time_saved) as total FROM jiv_interactions").get().total || 0;
-    const intakeCount = db.prepare("SELECT COUNT(*) as count FROM jiv_intakes").get().count;
-    const byCourt = db.prepare("SELECT court, COUNT(*) as count FROM jiv_interactions GROUP BY court ORDER BY count DESC").all();
-    const byStaff = db.prepare("SELECT staff, COUNT(*) as count, SUM(saved) as saved FROM jiv_interactions GROUP BY staff ORDER BY count DESC").all();
-    const avgPct = db.prepare("SELECT AVG(pct) as avg FROM jiv_interactions").get().avg || 0;
-
-    res.json({
-      success: true,
-      total, totalSaved, totalTime, intakeCount,
-      avgPct: Math.round(avgPct),
-      byCourt, byStaff
-    });
-  } catch (err) {
+    const db = readDB();
+    const total = db.interactions.length;
+    const totalSaved = db.interactions.reduce((s,e) => s + (e.saved||0), 0);
+    const totalTime = db.interactions.reduce((s,e) => s + (e.timeSaved||0), 0);
+    res.json({ success: true, total, totalSaved, totalTime, intakeCount: db.intakes.length });
+  } catch(err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -270,8 +151,7 @@ app.use(express.static(__dirname));
 app.post("/proxy/regulator", async (req, res) => {
   try {
     const response = await fetch("http://localhost:5002/v1/receive", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
+      method: "POST", headers: {"Content-Type": "application/json"},
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
@@ -295,8 +175,7 @@ app.post("/log/ungoverned", async (req, res) => {
   if (!IGM_PIPELINE_URL) return res.json({ logged: false });
   try {
     const response = await fetch(`${IGM_PIPELINE_URL}/v1/log/ungoverned`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
@@ -307,28 +186,24 @@ app.post("/log/ungoverned", async (req, res) => {
 });
 
 app.get("/health", (req, res) => {
+  const db = readDB();
   res.json({
     status: "ok",
     key_present: !!ANTHROPIC_API_KEY,
     igm_pipeline_connected: !!IGM_PIPELINE_URL,
     jiv_db: "active",
+    jiv_interactions: db.interactions.length,
     timestamp: new Date().toISOString()
   });
 });
 
-// ── Anthropic proxy (ungoverned path) ──────────────────────
+// ── Anthropic proxy ────────────────────────────────────────
 app.post("/proxy/anthropic", async (req, res) => {
-  if (!ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured" });
-  }
+  if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: "ANTHROPIC_API_KEY not configured" });
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
+      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
@@ -338,20 +213,17 @@ app.post("/proxy/anthropic", async (req, res) => {
   }
 });
 
-// ── IGM pipeline proxy (governed path) ─────────────────────
+// ── IGM pipeline proxy ─────────────────────────────────────
 app.post("/proxy/igm", async (req, res) => {
   if (IGM_PIPELINE_URL && IGM_LIVE_KEY) {
     try {
-      const prompt   = req.body.messages?.[0]?.content || req.body.prompt || "";
+      const prompt = req.body.messages?.[0]?.content || req.body.prompt || "";
       const langHint = req.body.lang_hint || "en";
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 90000);
       const response = await fetch(`${IGM_PIPELINE_URL}/v1/infer`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${IGM_LIVE_KEY}`
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${IGM_LIVE_KEY}` },
         body: JSON.stringify({ text: prompt, lang_hint: langHint }),
         signal: controller.signal
       });
@@ -368,20 +240,14 @@ app.post("/proxy/igm", async (req, res) => {
       }
       throw new Error(data.detail || "IGM pipeline error");
     } catch (err) {
-      console.error("[IGM] Pipeline error, falling back to Anthropic:", err.message);
+      console.error("[IGM] Pipeline error, falling back:", err.message);
     }
   }
-  if (!ANTHROPIC_API_KEY) {
-    return res.status(500).json({ error: "Neither IGM pipeline nor ANTHROPIC_API_KEY configured" });
-  }
+  if (!ANTHROPIC_API_KEY) return res.status(500).json({ error: "Neither IGM pipeline nor ANTHROPIC_API_KEY configured" });
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
+      headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" },
       body: JSON.stringify(req.body)
     });
     const data = await response.json();
