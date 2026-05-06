@@ -93,7 +93,7 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
 
 /* CONTENT */
 .room-content{flex:1;overflow-y:auto;background:var(--bg)}
-.room-inner{max-width:1100px;margin:0 auto;padding:18px 16px 80px}
+.room-inner{max-width:1100px;margin:0 auto;padding:18px 16px 100px}
 
 /* KPIs */
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
@@ -219,7 +219,7 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
 .check-item{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:12px;color:var(--text2)}
 .check-item:hover{border-color:var(--blue);background:var(--bl)}
 .check-item.checked{background:var(--bl);border-color:var(--blue);color:var(--blue);font-weight:500}
-.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:12px;border-bottom:1px solid var(--border);padding-bottom:0;border-top:1px solid var(--border);border-bottom:none}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
 .nav-btn{font-family:var(--mono);font-size:12px;font-weight:600;padding:9px 20px;border-radius:var(--r);border:none;cursor:pointer}
 .nav-prev{background:var(--bg);border:1px solid var(--border);color:var(--text2)}
 .nav-next{background:var(--navy);color:white}
@@ -557,6 +557,12 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
         <button class="tbtn p" id="jiv-scroll-form">Log Interaction</button>
         <button class="tbtn" id="jiv-refresh-btn">Refresh</button>
         <div class="spacer"></div>
+        <a href="https://app5.lasd.org.lic" target="_blank" class="tbtn" style="background:#1a1a2e;color:white;border-color:#1a1a2e;display:flex;align-items:center;gap:6px;text-decoration:none">
+          <span style="font-size:14px">⭐</span> LASD Custody
+        </a>
+        <a href="https://www.lacourt.ca.gov/pages/lp/access-a-case/tp/find-case-information/cp/os-criminal-case-access" target="_blank" class="tbtn" style="background:#1a3a6b;color:white;border-color:#1a3a6b;display:flex;align-items:center;gap:6px;text-decoration:none">
+          <span style="font-size:14px">🦅</span> Superior Court
+        </a>
         <button class="tbtn danger" id="jiv-reset-mine-btn2">Reset My Log</button>
         <button class="tbtn" id="jiv-export-btn">Export</button>
       </div>
@@ -863,7 +869,10 @@ function doLogin() {
   isSupervisor = (parts[2] === 'supervisor' || parts[0] === SUPERVISOR);
   isFounder = (parts[0] === FOUNDER);
   document.getElementById('lobby-user').textContent = currentUser.name + ' - ' + currentUser.title;
-  if (isFounder) document.getElementById('room-btn-founder').style.display = 'flex';
+  if (isFounder || currentUser.role === 'founder') {
+    var fb = document.getElementById('room-btn-founder');
+    if (fb) { fb.style.display = 'flex'; fb.style.removeProperty('display'); fb.setAttribute('style','display:flex !important;border-left:4px solid var(--gold);background:linear-gradient(135deg,#fef9e7,#fffbeb)'); }
+  }
   err.style.display = 'none';
   showScreen('lobby');
 }
@@ -1314,19 +1323,18 @@ function newIntake() {
 }
 
 // WIRE UP ALL BUTTONS
-document.getElementById('login-btn').addEventListener('click', doLogin);
-document.getElementById('login-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
-document.getElementById('signout-btn').addEventListener('click', doLogout);
-document.getElementById('room-btn-intake').addEventListener('click', function() { enterRoom('intake'); });
-document.getElementById('room-btn-jiv').addEventListener('click', function() { enterRoom('jiv'); });
-document.getElementById('room-btn-vetlog').addEventListener('click', function() { enterRoom('vetlog'); });
-document.getElementById('room-btn-founder').addEventListener('click', function() { enterRoom('founder'); });
-document.getElementById('back-intake').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('back-jiv').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('back-vetlog').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('back-founder').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('back-card').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('room-btn-card').addEventListener('click', function() {
+function wire(id, event, fn) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener(event, fn);
+}
+wire('login-btn', 'click', doLogin);
+wire('login-pass', 'keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+wire('signout-btn', 'click', doLogout);
+wire('room-btn-intake', 'click', function() { enterRoom('intake'); });
+wire('room-btn-jiv', 'click', function() { enterRoom('jiv'); });
+wire('room-btn-vetlog', 'click', function() { enterRoom('vetlog'); });
+wire('room-btn-founder', 'click', function() { enterRoom('founder'); });
+wire('room-btn-card', 'click', function() {
   showScreen('card');
   document.getElementById('card-ubadge').textContent = currentUser.name + ' - ' + currentUser.title;
   if (currentUser.name === FOUNDER) {
@@ -1339,35 +1347,42 @@ document.getElementById('room-btn-card').addEventListener('click', function() {
     document.getElementById('vso-card-title').textContent = currentUser.title;
   }
 });
-document.getElementById('back-to-lobby-from-intake').addEventListener('click', function() { showScreen('lobby'); });
-document.getElementById('new-intake-btn').addEventListener('click', newIntake);
-document.getElementById('copy-vetpro-btn').addEventListener('click', copyVetPro);
-document.getElementById('i-submit').addEventListener('click', submitIntake);
-document.getElementById('i-next-1').addEventListener('click', function() { iStep(2); });
-document.getElementById('i-next-2').addEventListener('click', function() { iStep(3); });
-document.getElementById('i-next-3').addEventListener('click', function() { iStep(4); });
-document.getElementById('i-next-4').addEventListener('click', function() { iStep(5); });
-document.getElementById('i-prev-2').addEventListener('click', function() { iStep(1); });
-document.getElementById('i-prev-3').addEventListener('click', function() { iStep(2); });
-document.getElementById('i-prev-4').addEventListener('click', function() { iStep(3); });
-document.getElementById('i-prev-5').addEventListener('click', function() { iStep(4); });
-document.getElementById('jiv-log-btn').addEventListener('click', function() { logInteraction('jiv'); });
-document.getElementById('jiv-off-toggle').addEventListener('click', function() { toggleOffline('jiv'); });
-document.getElementById('jiv-refresh-btn').addEventListener('click', function() { loadLog('jiv'); });
-document.getElementById('jiv-add-vso-btn').addEventListener('click', addVSO);
-document.getElementById('jiv-reset-mine-btn').addEventListener('click', function() { resetLog('mine', 'jiv'); });
-document.getElementById('jiv-reset-all-btn').addEventListener('click', function() { resetLog('all', 'jiv'); });
-document.getElementById('jiv-reset-mine-btn2').addEventListener('click', function() { resetLog('mine', 'jiv'); });
-document.getElementById('jiv-export-btn').addEventListener('click', function() { exportReport('jiv'); });
-document.getElementById('jiv-export-btn2').addEventListener('click', function() { exportReport('jiv'); });
-document.getElementById('jiv-scroll-form').addEventListener('click', function() { document.getElementById('jiv-log-form').scrollIntoView({behavior:'smooth'}); });
-document.getElementById('vet-log-btn').addEventListener('click', function() { logInteraction('vet'); });
-document.getElementById('vet-off-toggle').addEventListener('click', function() { toggleOffline('vet'); });
-document.getElementById('vet-refresh-btn').addEventListener('click', function() { loadLog('vet'); });
-document.getElementById('vet-reset-mine-btn').addEventListener('click', function() { resetLog('mine', 'vet'); });
-document.getElementById('vet-export-btn').addEventListener('click', function() { exportReport('vet'); });
-document.getElementById('vet-export-btn2').addEventListener('click', function() { exportReport('vet'); });
-document.getElementById('vet-scroll-form').addEventListener('click', function() { document.getElementById('vet-log-form').scrollIntoView({behavior:'smooth'}); });
+wire('back-intake', 'click', function() { showScreen('lobby'); });
+wire('back-jiv', 'click', function() { showScreen('lobby'); });
+wire('back-vetlog', 'click', function() { showScreen('lobby'); });
+wire('back-founder', 'click', function() { showScreen('lobby'); });
+wire('back-card', 'click', function() { showScreen('lobby'); });
+wire('back-to-lobby-from-intake', 'click', function() { showScreen('lobby'); });
+wire('new-intake-btn', 'click', newIntake);
+wire('copy-vetpro-btn', 'click', copyVetPro);
+wire('i-submit', 'click', submitIntake);
+wire('i-next-1', 'click', function() { iStep(2); });
+wire('i-next-2', 'click', function() { iStep(3); });
+wire('i-next-3', 'click', function() { iStep(4); });
+wire('i-next-4', 'click', function() { iStep(5); });
+wire('i-prev-2', 'click', function() { iStep(1); });
+wire('i-prev-3', 'click', function() { iStep(2); });
+wire('i-prev-4', 'click', function() { iStep(3); });
+wire('i-prev-5', 'click', function() { iStep(4); });
+wire('jiv-log-btn', 'click', function() { logInteraction('jiv'); });
+wire('jiv-off-toggle', 'click', function() { toggleOffline('jiv'); });
+wire('jiv-refresh-btn', 'click', function() { loadLog('jiv'); });
+wire('jiv-add-vso-btn', 'click', addVSO);
+wire('jiv-reset-mine-btn', 'click', function() { resetLog('mine', 'jiv'); });
+wire('jiv-reset-all-btn', 'click', function() { resetLog('all', 'jiv'); });
+wire('jiv-reset-mine-btn2', 'click', function() { resetLog('mine', 'jiv'); });
+wire('jiv-export-btn', 'click', function() { exportReport('jiv'); });
+wire('jiv-export-btn2', 'click', function() { exportReport('jiv'); });
+wire('jiv-scroll-form', 'click', function() { document.getElementById('jiv-log-form').scrollIntoView({behavior:'smooth'}); });
+wire('vet-log-btn', 'click', function() { logInteraction('vet'); });
+wire('vet-off-toggle', 'click', function() { toggleOffline('vet'); });
+wire('vet-refresh-btn', 'click', function() { loadLog('vet'); });
+wire('vet-reset-mine-btn', 'click', function() { resetLog('mine', 'vet'); });
+wire('vet-export-btn', 'click', function() { exportReport('vet'); });
+wire('vet-export-btn2', 'click', function() { exportReport('vet'); });
+wire('vet-scroll-form', 'click', function() { document.getElementById('vet-log-form').scrollIntoView({behavior:'smooth'}); });
+wire('card-save-btn', 'click', downloadCard);
+wire('card-print-btn', 'click', function() { window.print(); });
 
 // Radio and checkbox styling
 var radioItems = document.querySelectorAll('.radio-item input');
@@ -1437,6 +1452,14 @@ window.addEventListener('online', function() {
                 <div style="display:flex;flex-direction:column;gap:4px">
                   <div style="font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.7)">jdebacco@mva.lacounty.gov</div>
                   <div style="font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.7)">213.824.6862</div>
+                  <div style="font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.7)">1816 S. Figueroa St., 2nd Floor, Los Angeles, CA 90015</div>
+                  <div style="margin-top:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:7px 11px">
+                    <div style="font-family:var(--mono);font-size:9px;color:rgba(201,168,76,.7);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">VA Accreditation</div>
+                    <div style="font-family:var(--mono);font-size:12px;color:#d4a017;font-weight:600">No. 59141</div>
+                    <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);margin-top:2px">U.S. Department of Veterans Affairs</div>
+                    <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.4)">CA Dept. of Veterans Services · POA 044</div>
+                    <div style="font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.4)">NACVSO · POA 064</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1462,10 +1485,10 @@ window.addEventListener('online', function() {
               </div>
             </div>
             <!-- Action buttons -->
-            <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
-              <button onclick="downloadCard()" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--gold);color:var(--navy);cursor:pointer">Save Contact</button>
-              <button onclick="window.print()" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;cursor:pointer">Print Card</button>
-              <a href="mailto:jdebacco@mva.lacounty.gov" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;text-decoration:none;display:inline-block">Send Email</a>
+            <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center">
+              <button id="card-save-btn" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--gold);color:var(--navy);cursor:pointer">Save Contact</button>
+              <button id="card-print-btn" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;cursor:pointer">Print Card</button>
+              <a id="card-email-btn" href="mailto:jdebacco@mva.lacounty.gov" style="font-family:var(--mono);font-size:11px;font-weight:600;padding:8px 18px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;text-decoration:none;display:inline-block">Send Email</a>
             </div>
           </div>
         </div>
