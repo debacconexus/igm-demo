@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Repositories · DeBacco Nexus LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --ink: #0a0f1a;
+    --ink2: #2d3748;
+    --ink3: #718096;
+    --cream: #faf9f6;
+    --cream2: #f0ede6;
+    --gold: #c9a84c;
+    --gold-light: #f5e6b8;
+    --green: #0a7c5c;
+    --green-light: #ecfaf5;
+    --blue: #1a3a6b;
+    --blue-light: #e8f0fb;
+    --red: #8b1a1a;
+    --red-light: #fdf0f0;
+    --border: #e2ddd6;
+    --sans: 'DM Sans', sans-serif;
+    --serif: 'Fraunces', serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .header-left { flex: 1; min-width: 280px; }
+
+  .header-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .header-title {
+    font-family: var(--serif);
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 16px;
+    color: var(--cream);
+  }
+
+  .header-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,.6);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,.5);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: .05em;
+  }
+
+  /* ── Main QR ── */
+  .header-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .qr-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,.4);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .qr-box {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Wrap ── */
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 56px 40px 80px;
+  }
+
+  .section-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Repository Cards ── */
+  .repos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 56px;
+  }
+
+  .repo-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: box-shadow .2s, transform .2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .repo-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .repo-card.layer-1::before { background: var(--blue); }
+  .repo-card.layer-2::before { background: var(--green); }
+  .repo-card.layer-3::before { background: var(--red); }
+
+  .repo-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,.1);
+    transform: translateY(-2px);
+  }
+
+  .repo-layer {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .layer-1 .repo-layer { color: var(--blue); }
+  .layer-2 .repo-layer { color: var(--green); }
+  .layer-3 .repo-layer { color: var(--red); }
+
+  .repo-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: -.01em;
+    line-height: 1.2;
+  }
+
+  .repo-desc {
+    font-size: 13px;
+    color: var(--ink3);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .repo-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .repo-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .layer-1 .repo-tag { background: var(--blue-light); color: var(--blue); }
+  .layer-2 .repo-tag { background: var(--green-light); color: var(--green); }
+  .layer-3 .repo-tag { background: var(--red-light); color: var(--red); }
+
+  .repo-qr-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .repo-url {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink3);
+    word-break: break-all;
+    flex: 1;
+  }
+
+  .repo-qr-wrap {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 6px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .repo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    transition: all .15s;
+    margin-top: 4px;
+  }
+
+  .layer-1 .repo-link { background: var(--blue-light); color: var(--blue); }
+  .layer-2 .repo-link { background: var(--green-light); color: var(--green); }
+  .layer-3 .repo-link { background: var(--red-light); color: var(--red); }
+
+  .repo-link:hover { opacity: .8; }
+
+  /* ── Architecture note ── */
+  .arch-note {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch-note::before {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,.1) 0%, transparent 70%);
+  }
+
+  .arch-layer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+
+  .arch-layer:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,.2);
+    font-size: 18px;
+  }
+
+  .arch-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: .1em;
+  }
+
+  .arch-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--cream);
+  }
+
+  .arch-desc {
+    font-size: 12px;
+    color: rgba(255,255,255,.5);
+    line-height: 1.6;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 0 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { color: var(--ink3); text-decoration: none; }
+  .footer-links a:hover { color: var(--ink); }
+
+  @media(max-width:700px) {
+    .header { padding: 32px 24px; }
+    .wrap { padding: 36px 24px 60px; }
+    .arch-note { grid-template-columns: 1fr; }
+    .arch-layer::after { display: none; }
+    .repos { grid-template-columns: 1fr; }
+    .header-inner { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-eyebrow">DeBacco Nexus LLC · info@debacconexus.com</div>
+      <h1 class="header-title">AI <em>Repositories</em></h1>
+      <p class="header-sub">Live governance infrastructure for public AI inference. Three accountability layers — inference, operator, and regulatory — built for California public agencies and deployable globally.</p>
+      <div class="header-meta">
+        <span class="meta-tag">USPTO 19/571,156 · Patent Pending</span>
+        <span class="meta-tag">USC Doctoral Research</span>
+        <span class="meta-tag">CalCompute Consortium</span>
+        <span class="meta-tag">SB-53 Aligned</span>
+      </div>
+    </div>
+    <div class="header-qr">
+      <div class="qr-label">Scan to access</div>
+      <div class="qr-box" id="qr-main"></div>
+      <div class="qr-label">debacconexus.ai</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="section-eyebrow">Governance Infrastructure · Three Layers</div>
+
+  <!-- Architecture overview -->
+  <div class="arch-note">
+    <div class="arch-layer">
+      <div class="arch-num">Layer 01</div>
+      <div class="arch-title">Inference Governance</div>
+      <div class="arch-desc">Token ceiling enforcement, domain classification, cryptographic catalogue signatures. Every inference governed before it leaves.</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-num">Layer 02</div>
+      <div class="arch-title">Operator Accountability</div>
+      <div class="arch-desc">Real-time metering, GU tracking, billing, immutable audit trail. The operator sees every inference with full provenance.</div>
+    </div>
+    <div class="arch-layer">
+      <div class="arch-num">Layer 03</div>
+      <div class="arch-title">Regulatory Accountability</div>
+      <div class="arch-desc">Non-human classifier scores every inference against SB-53 and G-AISRI standards. Human regulators receive flagged findings.</div>
+    </div>
+  </div>
+
+  <div class="section-eyebrow">Live Repositories · Access Now</div>
+
+  <div class="repos">
+
+    <!-- Repo 1 -->
+    <div class="repo-card layer-1">
+      <div class="repo-layer">Layer 01 · Inference</div>
+      <div class="repo-title">IGM Live Demo</div>
+      <p class="repo-desc">Real-world California public service scenarios — governed vs. ungoverned AI inference. Run each path independently and see exactly what governance changes. Wildfire dispatch, veterans crisis, LAPD MEU, DCFS, Caltrans, election integrity.</p>
+      <div class="repo-tags">
+        <span class="repo-tag">Live Inference</span>
+        <span class="repo-tag">10 Scenarios</span>
+        <span class="repo-tag">22 Languages</span>
+        <span class="repo-tag">Uncapped Comparison</span>
+      </div>
+      <div class="repo-qr-row">
+        <div class="repo-url">igm-demo-production.up.railway.app</div>
+        <div class="repo-qr-wrap" id="qr-demo"></div>
+      </div>
+      <a class="repo-link" href="https://igm-demo-production.up.railway.app" target="_blank">&#9654; Open Repository</a>
+    </div>
+
+    <!-- Repo 2 -->
+    <div class="repo-card layer-2">
+      <div class="repo-layer">Layer 02 · Operator</div>
+      <div class="repo-title">IGM Admin Dashboard</div>
+      <p class="repo-desc">Real-time operator accountability. Governance units, revenue, API key management, cryptographically signed audit log with catalogue IDs. Every governed and ungoverned inference tracked with bilateral path accountability.</p>
+      <div class="repo-tags">
+        <span class="repo-tag">Live Metering</span>
+        <span class="repo-tag">Crypto Signatures</span>
+        <span class="repo-tag">Bilateral Audit</span>
+        <span class="repo-tag">GU Tracking</span>
+      </div>
+      <div class="repo-qr-row">
+        <div class="repo-url">igm-demo-production.up.railway.app/dashboard</div>
+        <div class="repo-qr-wrap" id="qr-admin"></div>
+      </div>
+      <a class="repo-link" href="https://igm-demo-production.up.railway.app/dashboard" target="_blank">&#9654; Open Repository</a>
+    </div>
+
+    <!-- Repo 3 -->
+    <div class="repo-card layer-3">
+      <div class="repo-layer">Layer 03 · Regulatory</div>
+      <div class="repo-title">State Regulator Node</div>
+      <p class="repo-desc">Non-human California AI regulatory classifier. Automatically receives every public agency inference — governed and ungoverned — scores against SB-53 and G-AISRI/TAE-AG standards, maintains immutable state ledger, and generates billable compliance reports for human regulators.</p>
+      <div class="repo-tags">
+        <span class="repo-tag">SB-53</span>
+        <span class="repo-tag">G-AISRI</span>
+        <span class="repo-tag">Non-Human Classifier</span>
+        <span class="repo-tag">Immutable Ledger</span>
+      </div>
+      <div class="repo-qr-row">
+        <div class="repo-url">igm-regulator · Deploying to Railway</div>
+        <div class="repo-qr-wrap" id="qr-regulator"></div>
+      </div>
+      <a class="repo-link" href="https://igm-demo-production.up.railway.app/dashboard" target="_blank">&#9654; Preview Layer</a>
+    </div>
+
+  </div>
+
+  <div class="section-eyebrow">About the Work</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:48px">
+    <div>
+      <p style="font-size:13px;color:var(--ink2);line-height:1.8;margin-bottom:16px">The Inference Governance Module (IGM) is the first infrastructure-layer AI governance system designed for public sector deployment. Built on the Transformational Accountability Ecosystem (TAE) framework developed over 15 years in California correctional and public service settings, the IGM applies the same accountability principles to artificial intelligence.</p>
+      <p style="font-size:13px;color:var(--ink2);line-height:1.8">Every public agency AI inference — governed or ungoverned — is automatically classified, logged, and reported. The human regulator never has to trust anyone. The system audits itself.</p>
+    </div>
+    <div style="background:var(--cream2);border:1px solid var(--border);border-radius:10px;padding:24px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px">Key Metrics · Reference Environment</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--ink3)">Token reduction</span><span style="font-family:var(--mono);font-weight:500;color:var(--green)">67% – 98.2%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--ink3)">Mean energy reduction</span><span style="font-family:var(--mono);font-weight:500;color:var(--green)">17.4%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--ink3)">Ungoverned states</span><span style="font-family:var(--mono);font-weight:500;color:var(--green)">Zero across 50 scenarios</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding-bottom:10px;border-bottom:1px solid var(--border)"><span style="color:var(--ink3)">Languages supported</span><span style="font-family:var(--mono);font-weight:500">22</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--ink3)">Patent status</span><span style="font-family:var(--mono);font-weight:500">USPTO 19/571,156</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>DeBacco Nexus LLC · USPTO Provisional 19/571,156 · info@debacconexus.com</div>
+    <div class="footer-links">
+      <a href="https://www.debacconexus.ai">debacconexus.ai</a>
+      <a href="https://igm-demo-production.up.railway.app">Live Demo</a>
+      <a href="https://github.com/debacconexus">GitHub</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Main QR — points to this page / debacconexus.ai
+  new QRCode(document.getElementById("qr-main"), {
+    text: "https://www.debacconexus.ai",
+    width: 120, height: 120,
+    colorDark: "#0a0f1a", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Demo QR
+  new QRCode(document.getElementById("qr-demo"), {
+    text: "https://igm-demo-production.up.railway.app",
+    width: 80, height: 80,
+    colorDark: "#1a3a6b", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Admin QR
+  new QRCode(document.getElementById("qr-admin"), {
+    text: "https://igm-demo-production.up.railway.app/dashboard",
+    width: 80, height: 80,
+    colorDark: "#0a7c5c", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // Regulator QR — points to dashboard for now
+  new QRCode(document.getElementById("qr-regulator"), {
+    text: "https://www.debacconexus.ai",
+    width: 80, height: 80,
+    colorDark: "#8b1a1a", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+USPTO 19/571,156 · PATENT PENDING · DEBACCO NEXUS LLC
+Inference Governance Module
+Governed vs. ungoverned AI inference — real-world public safety, veterans services, and crisis response scenarios. See exactly what governance changes in high-stakes decision support.
+⚠ Decision support only. All outputs require human clinical and professional review before action. IGM does not replace licensed clinicians, social workers, or emergency responders.
+Live Demo
+Architecture
+
+
+PROMPT — IDENTICAL QUERY SENT TO BOTH PATHS SIMULTANEOUSLY
+
+
+IGM Governed
+
+GOVERNANCE LOG
+
+
+RESPONSE
+
+
+
+Ungoverned
+
+GOVERNANCE LOG
+No governance layer — direct LLM access. No constraints enforced.
+
+RESPONSE
+
+
+Run Scenario
+Cumulative savings — this session
+Token differential × constants: 0.3 mWh · 0.5 mL H₂O · 0.15 mg CO₂ · $0.003/1K tokens
+Tokens saved
+0
+Energy (mWh)
+0.00
+Water (mL)
+0.0
+CO₂ (mg)
+0.00
+Cost saved ($)
+0.0000
+IGM — Inference Governance Module  ·  DeBacco Nexus LLC  ·  USPTO Provisional 19/571,156  ·  info@debacconexus.com

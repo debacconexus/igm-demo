@@ -1,0 +1,64 @@
+// ======================================
+// IGM — Inference Governance Module
+// CLEAN GOVERNANCE DEMO (DETERMINISTIC)
+// ======================================
+
+import express from "express";
+
+const app = express();
+app.use(express.json());
+
+// --------------------------------------
+// Simulated AI output (what the model does)
+// --------------------------------------
+function fakeLLM(prompt) {
+  return `
+Based on the provided parameters, the robotic system should evaluate
+human proximity, confirm deceleration capability, check emergency stop
+latency, review safety thresholds, notify operators, log the incident,
+and initiate a controlled shutdown while documenting compliance steps.
+`;
+}
+
+// --------------------------------------
+// IGM Governance Policy (THE PRODUCT)
+// --------------------------------------
+function enforceGovernance(rawText) {
+  return {
+    decision: "IMMEDIATE_STOP",
+    reason: "Human detected within unsafe distance",
+    distance_meters: 0.8,
+    allowed_actions: ["HALT_MOTION"],
+    prohibited_actions: ["CONTINUE_OPERATION", "ADJUST_SPEED"],
+    escalation_required: true
+  };
+}
+
+// --------------------------------------
+// Inference Gateway
+// --------------------------------------
+app.post("/infer", (req, res) => {
+  const { prompt, mode } = req.body;
+
+  const raw = fakeLLM(prompt);
+
+  if (mode === "governed") {
+    return res.json({
+      governed: true,
+      output_type: "ENFORCED_DECISION",
+      output: enforceGovernance(raw)
+    });
+  }
+
+  return res.json({
+    governed: false,
+    output_type: "MODEL_REASONING",
+    output: raw
+  });
+});
+
+// --------------------------------------
+app.listen(3333, () =>
+  console.log("✅ IGM DEMO SERVER RUNNING — CLEAN GOVERNANCE")
+);
+

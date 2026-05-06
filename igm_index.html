@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inference Governance Module — Live Demo · DeBacco Nexus LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:#ffffff;--bg2:#f7f8fa;--bg3:#eef0f3;--border:#e3e6eb;--border2:#d0d5dd;
+    --text:#0d1117;--text2:#4a5568;--text3:#9aa3af;
+    --green:#0a7c5c;--green-light:#ecfaf5;--green-border:#b2dfd0;
+    --red:#c0392b;--red-light:#fdf2f1;--red-border:#f5c0bb;
+    --blue:#1a56db;--blue-light:#eff4ff;--blue-border:#b4c8f8;
+    --amber:#b45309;--amber-light:#fffbeb;
+    --sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+    --radius:8px;--radius-lg:12px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06);--shadow:0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+  .wrap{max-width:1000px;margin:0 auto;padding:36px 24px 80px}
+  .header{padding-bottom:24px;margin-bottom:28px;border-bottom:1px solid var(--border)}
+  .header-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .header-title{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.025em;line-height:1.2;margin-bottom:6px}
+  .header-sub{font-size:14px;color:var(--text2);max-width:680px;line-height:1.65;margin-bottom:14px}
+  .disclaimer{font-size:12px;color:var(--amber);background:var(--amber-light);border:1px solid #fde68a;border-radius:6px;padding:9px 14px;max-width:680px;line-height:1.55}
+  .view-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+  .view-btn{background:transparent;border:none;border-bottom:2px solid transparent;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text3);font-family:var(--sans);transition:all .15s;margin-bottom:-1px}
+  .view-btn:hover{color:var(--text2)}
+  .view-btn.on{color:var(--blue);border-bottom-color:var(--blue)}
+  .scenario-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .sc-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:11px;font-weight:500;cursor:pointer;color:var(--text2);font-family:var(--mono);transition:all .15s;white-space:nowrap}
+  .sc-btn:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
+  .sc-btn.on{background:var(--blue-light);border-color:var(--blue-border);color:var(--blue);font-weight:600}
+  .sc-btn.custom-tab.on{background:var(--green-light);border-color:var(--green-border);color:var(--green)}
+  .lang-selector{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);align-items:center}
+  .lang-selector-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-right:4px;white-space:nowrap}
+  .lang-btn{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:18px;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1}
+  .lang-btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+  .lang-btn.on{background:var(--blue-light);border-color:var(--blue-border);box-shadow:0 0 0 2px var(--blue-border)}
+  .scenario-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+  .scenario-num{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+  .scenario-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.015em}
+  .scenario-pitch{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px;border-left:3px solid var(--blue-border);padding-left:12px;font-style:italic}
+  .scenario-badges{display:flex;gap:6px;flex-wrap:wrap}
+  .badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:4px;font-weight:500}
+  .badge-blue{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border)}
+  .badge-green{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+  .badge-gray{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+  .prompt-wrap{margin-bottom:16px}
+  .prompt-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .prompt-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.75;box-shadow:var(--shadow-sm)}
+  .custom-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px}
+  .custom-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+  .custom-sub{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6}
+  .custom-input{width:100%;min-height:100px;padding:12px 14px;font-size:13px;font-family:var(--sans);line-height:1.65;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);resize:vertical;outline:none;transition:border-color .15s;box-shadow:var(--shadow-sm)}
+  .custom-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.07)}
+  .custom-input::placeholder{color:var(--text3)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  @media(max-width:520px){.btn-row{grid-template-columns:1fr}}
+  .btn-ungov{padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);border:1.5px solid var(--red);border-radius:var(--radius);color:var(--red);font-family:var(--sans);transition:all .15s;box-shadow:var(--shadow-sm)}
+  .btn-ungov:hover:not(:disabled){background:var(--red-light)}
+  .btn-ungov:disabled{opacity:.4;cursor:not-allowed}
+  .btn-gov{padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;background:var(--green);border:1.5px solid var(--green);border-radius:var(--radius);color:#fff;font-family:var(--sans);transition:all .15s;box-shadow:var(--shadow-sm)}
+  .btn-gov:hover:not(:disabled){background:#086648}
+  .btn-gov:disabled{opacity:.4;cursor:not-allowed}
+  .btn-hint{font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px;letter-spacing:.02em}
+  .panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  @media(max-width:620px){.panels{grid-template-columns:1fr}}
+  .panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;box-shadow:var(--shadow)}
+  .panel-header{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:12px}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .panel-title{font-size:12px;font-weight:600;letter-spacing:.02em}
+  .panel-ceiling{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto;background:var(--bg3);padding:2px 8px;border-radius:4px}
+  .log-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .log-area{min-height:100px;margin-bottom:12px}
+  .log-row{display:flex;gap:8px;padding:3px 0;font-family:var(--mono);font-size:11px;line-height:1.5;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s}
+  .log-row.vis{opacity:1;transform:none}
+  .log-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px}
+  .log-empty{font-family:var(--mono);font-size:11px;color:var(--text3);font-style:italic;min-height:100px;display:flex;align-items:center;padding:10px 12px;background:var(--bg2);border-radius:6px;border:1px dashed var(--border)}
+  .divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+  .resp-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .resp-text{font-size:12px;line-height:1.8;white-space:pre-wrap;min-height:60px;color:var(--text)}
+  .resp-pending{color:var(--text3);font-style:italic;font-size:12px}
+  .resp-tokens{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px}
+  .err-box{font-size:12px;color:var(--red);background:var(--red-light);border:1px solid var(--red-border);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px}
+  .diff-box{border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;border:1px solid var(--border);background:var(--bg2);box-shadow:var(--shadow-sm)}
+  .diff-box.saved{background:var(--green-light);border-color:var(--green-border)}
+  .diff-val{font-family:var(--mono);font-size:22px;font-weight:700}
+  .diff-divider{width:1px;height:34px;background:var(--border);flex-shrink:0}
+  .diff-col{min-width:64px}
+  .diff-col-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px}
+  .diff-col-val{font-family:var(--mono);font-size:15px;font-weight:600}
+  .diff-pct{margin-left:auto;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green);background:var(--green-light);padding:5px 12px;border-radius:5px;border:1px solid var(--green-border)}
+  .session-totals{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  @media(max-width:620px){.session-totals{grid-template-columns:1fr}}
+  .totals-panel{border-radius:var(--radius-lg);padding:16px 20px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+  .totals-panel.ungov{background:var(--red-light);border-color:var(--red-border)}
+  .totals-panel.gov{background:var(--green-light);border-color:var(--green-border)}
+  .totals-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .totals-title{font-size:12px;font-weight:700;letter-spacing:.02em}
+  .totals-title.ungov{color:var(--red)}
+  .totals-title.gov{color:var(--green)}
+  .totals-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .totals-item{background:rgba(255,255,255,.7);border-radius:6px;padding:8px 10px}
+  .totals-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:2px}
+  .totals-val{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text)}
+  .mike-drop{background:var(--text);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+  .mike-drop::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(10,124,92,.3) 0%,rgba(26,86,219,.2) 100%);pointer-events:none}
+  .mike-drop-eyebrow{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+  .mike-drop-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;letter-spacing:-.02em}
+  .mike-drop-sub{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5);margin-bottom:20px}
+  .mike-drop-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;position:relative}
+  @media(max-width:600px){.mike-drop-grid{grid-template-columns:repeat(3,1fr)}}
+  .mike-metric{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px}
+  .mike-metric-label{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.5);margin-bottom:4px}
+  .mike-metric-val{font-family:var(--mono);font-size:20px;font-weight:700;color:#fff}
+  .mike-metric-val.highlight{color:#4ade80;font-size:24px}
+  .mike-pct{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:13px;font-weight:700;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);padding:6px 16px;border-radius:20px;position:relative}
+  .status-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--text3);font-family:var(--mono)}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--bg3)}
+  .status-dot.ungov-done{background:var(--red)}
+  .status-dot.gov-done{background:var(--green)}
+  .status-dot.running{background:#f59e0b;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .arch-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
+  .arch-note{font-family:var(--mono);font-size:11px;color:var(--text3);padding:10px 14px;background:var(--bg3);border-radius:var(--radius);margin-top:16px;border:1px solid var(--border);line-height:1.6;text-align:center}
+  .footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;line-height:2}
+  .footer a{color:var(--text3);text-decoration:none}
+  .footer a:hover{color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-eyebrow">USPTO 19/571,156 &middot; Patent Pending &middot; DeBacco Nexus LLC &middot; info@debacconexus.com</div>
+    <div class="header-title">Inference Governance Module</div>
+    <div class="header-sub">Real-world California public service scenarios — governed vs. ungoverned AI inference. Run each path independently and see exactly what governance changes.</div>
+    <div class="disclaimer">&#9888; Decision support only. All outputs require human clinical, legal, and professional review before action. IGM does not replace licensed clinicians, social workers, law enforcement, or emergency responders.</div>
+  </div>
+  <div class="view-tabs">
+    <button class="view-btn on" id="bDemo" onclick="setView('demo')">Live Demo</button>
+    <button class="view-btn" id="bArch" onclick="setView('arch')">Architecture</button>
+  </div>
+  <div id="vDemo">
+    <div class="lang-selector" id="langSelector">
+      <span class="lang-selector-label">&#127760; Response language:</span>
+    </div>
+    <div class="scenario-grid" id="scTabs"></div>
+    <div class="scenario-card" id="scCard" style="display:none">
+      <div class="scenario-num" id="scNum"></div>
+      <div class="scenario-title" id="scTitle"></div>
+      <div class="scenario-pitch" id="scPitch"></div>
+      <div class="scenario-badges" id="scBadges"></div>
+    </div>
+    <div class="custom-wrap" id="customWrap" style="display:none">
+      <div class="custom-title">Custom Prompt — Test Any California Public Service Scenario</div>
+      <div class="custom-sub">Enter any real-world prompt below to test the IGM in real time.</div>
+      <textarea class="custom-input" id="customInput" placeholder="Example: A social worker at DPSS is processing an emergency benefits application for a recently released veteran with no income, unstable housing, and a disability claim pending. What services should be prioritized?"></textarea>
+    </div>
+    <div class="prompt-wrap" id="promptWrap">
+      <div class="prompt-label">Prompt — identical query sent to both paths</div>
+      <div class="prompt-box" id="promptBox"></div>
+    </div>
+    <div class="status-row" id="statusRow" style="display:none">
+      <div class="status-dot" id="ungDot"></div>
+      <span id="ungStatus">Ungoverned — waiting</span>
+      <span style="margin:0 10px;color:var(--border2)">|</span>
+      <div class="status-dot" id="govDot"></div>
+      <span id="govStatus">Governed — waiting</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ungov" id="btnUngov" onclick="runUngoverned()">&#9654; Run Ungoverned</button>
+      <button class="btn-gov" id="btnGov" onclick="runGoverned()">&#9654; Run Governed</button>
+    </div>
+    <div class="btn-hint" id="btnHint">Run Ungoverned first — then run Governed to see the difference</div>
+    <div class="err-box" id="errBox" style="display:none"></div>
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="dot" style="background:var(--red)"></div>
+          <span class="panel-title" style="color:var(--red)">Ungoverned</span>
+          <span class="panel-ceiling" id="ungCeil"></span>
+        </div>
+        <div class="log-label">Governance Log</div>
+        <div id="ungLogEmpty" class="log-empty">No governance layer — direct LLM access. No constraints enforced.</div>
+        <div class="log-area" id="ungLog" style="display:none"></div>
+        <hr class="divider"/>
+        <div class="resp-label">Response</div>
+        <div class="resp-text" id="ungResp"><span class="resp-pending">Run Ungoverned to see response</span></div>
+        <div class="resp-tokens" id="ungTok"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <div class="dot" style="background:var(--green)"></div>
+          <span class="panel-title" style="color:var(--green)">IGM Governed</span>
+          <span class="panel-ceiling" id="govCeil"></span>
+        </div>
+        <div class="log-label">Governance Log</div>
+        <div class="log-area" id="govLog"><div class="log-empty">Run Governed to see the governance decision log</div></div>
+        <hr class="divider"/>
+        <div class="resp-label">Response</div>
+        <div class="resp-text" id="govResp"><span class="resp-pending">Run Governed to see response</span></div>
+        <div class="resp-tokens" id="govTok"></div>
+      </div>
+    </div>
+    <div id="diffBox" style="display:none" class="diff-box">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">Token differential</div>
+        <div class="diff-val" id="diffVal"></div>
+      </div>
+      <div class="diff-divider"></div>
+      <div class="diff-col"><div class="diff-col-label">Ungoverned</div><div class="diff-col-val" id="diffUng" style="color:var(--red)"></div></div>
+      <div class="diff-col"><div class="diff-col-label">Governed</div><div class="diff-col-val" id="diffGov" style="color:var(--green)"></div></div>
+      <div class="diff-pct" id="diffPct"></div>
+    </div>
+    <div class="session-totals" id="sessionTotals" style="display:none">
+      <div class="totals-panel ungov">
+        <div class="totals-header">
+          <div class="dot" style="background:var(--red)"></div>
+          <span class="totals-title ungov">Ungoverned — This Session</span>
+        </div>
+        <div class="totals-grid">
+          <div class="totals-item"><div class="totals-label">Total Tokens</div><div class="totals-val" id="uTok">0</div></div>
+          <div class="totals-item"><div class="totals-label">Inferences</div><div class="totals-val" id="uInf">0</div></div>
+          <div class="totals-item"><div class="totals-label">Avg Tokens</div><div class="totals-val" id="uAvg">0</div></div>
+          <div class="totals-item"><div class="totals-label">Est. Energy (mWh)</div><div class="totals-val" id="uEnergy">0.00</div></div>
+        </div>
+      </div>
+      <div class="totals-panel gov">
+        <div class="totals-header">
+          <div class="dot" style="background:var(--green)"></div>
+          <span class="totals-title gov">IGM Governed — This Session</span>
+        </div>
+        <div class="totals-grid">
+          <div class="totals-item"><div class="totals-label">Total Tokens</div><div class="totals-val" id="gTok">0</div></div>
+          <div class="totals-item"><div class="totals-label">Inferences</div><div class="totals-val" id="gInf">0</div></div>
+          <div class="totals-item"><div class="totals-label">Avg Tokens</div><div class="totals-val" id="gAvg">0</div></div>
+          <div class="totals-item"><div class="totals-label">Est. Energy (mWh)</div><div class="totals-val" id="gEnergy">0.00</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="mike-drop" id="mikeDrop" style="display:none">
+      <div class="mike-drop-eyebrow">Cumulative Governance Impact — This Session</div>
+      <div class="mike-drop-title">IGM Resource Savings</div>
+      <div class="mike-drop-sub">Token differential x constants: 0.3 mWh · 0.5 mL H2O · 0.15 mg CO2 · $0.003/1K tokens</div>
+      <div class="mike-drop-grid">
+        <div class="mike-metric"><div class="mike-metric-label">Tokens Saved</div><div class="mike-metric-val highlight" id="mT">0</div></div>
+        <div class="mike-metric"><div class="mike-metric-label">Energy (mWh)</div><div class="mike-metric-val" id="mE">0.00</div></div>
+        <div class="mike-metric"><div class="mike-metric-label">Water (mL)</div><div class="mike-metric-val" id="mW">0.0</div></div>
+        <div class="mike-metric"><div class="mike-metric-label">CO2 (mg)</div><div class="mike-metric-val" id="mC">0.00</div></div>
+        <div class="mike-metric"><div class="mike-metric-label">Cost Saved ($)</div><div class="mike-metric-val" id="mK">0.0000</div></div>
+      </div>
+      <div id="mikePct" class="mike-pct" style="display:none"></div>
+    </div>
+  </div>
+  <div id="vArch" style="display:none">
+    <div class="arch-wrap">
+    <svg width="100%" viewBox="0 0 700 520" role="img">
+      <title>IGM inference boundary architecture</title>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <line x1="350" y1="20" x2="350" y2="480" stroke="#e3e6eb" stroke-width="1" stroke-dasharray="5 5"/>
+      <text font-family="DM Sans" font-size="14" font-weight="600" fill="#0d1117" x="165" y="32" text-anchor="middle">Governed path</text>
+      <text font-family="DM Mono" font-size="11" fill="#0a7c5c" x="165" y="48" text-anchor="middle">IGM active</text>
+      <text font-family="DM Sans" font-size="14" font-weight="600" fill="#0d1117" x="535" y="32" text-anchor="middle">Ungoverned path</text>
+      <text font-family="DM Mono" font-size="11" fill="#c0392b" x="535" y="48" text-anchor="middle">Direct LLM access</text>
+      <rect x="65" y="60" width="200" height="44" rx="8" fill="#f7f8fa" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="500" fill="#4a5568" x="165" y="82" text-anchor="middle" dominant-baseline="central">User request</text>
+      <line x1="165" y1="104" x2="165" y2="120" stroke="#d0d5dd" stroke-width="1.5" marker-end="url(#ah)"/>
+      <rect x="65" y="122" width="200" height="188" rx="10" fill="#ecfaf5" stroke="#b2dfd0" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="14" font-weight="700" fill="#0a7c5c" x="165" y="142" text-anchor="middle" dominant-baseline="central">IGM</text>
+      <text font-family="DM Mono" font-size="10" fill="#086648" x="165" y="158" text-anchor="middle" dominant-baseline="central">Inference governance module</text>
+      <rect x="83" y="168" width="164" height="26" rx="5" fill="#fff" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Mono" font-size="11" fill="#4a5568" x="165" y="181" text-anchor="middle" dominant-baseline="central">Input validation</text>
+      <rect x="83" y="200" width="164" height="26" rx="5" fill="#fff" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Mono" font-size="11" fill="#4a5568" x="165" y="213" text-anchor="middle" dominant-baseline="central">PII scanner</text>
+      <rect x="83" y="232" width="164" height="26" rx="5" fill="#fff" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Mono" font-size="11" fill="#4a5568" x="165" y="245" text-anchor="middle" dominant-baseline="central">Token ceiling enforcer</text>
+      <rect x="83" y="264" width="164" height="26" rx="5" fill="#fff" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Mono" font-size="11" fill="#4a5568" x="165" y="277" text-anchor="middle" dominant-baseline="central">Output classifier</text>
+      <line x1="165" y1="310" x2="165" y2="328" stroke="#0a7c5c" stroke-width="1.5" marker-end="url(#ah)"/>
+      <text font-family="DM Mono" font-size="10" fill="#0a7c5c" x="178" y="320" dominant-baseline="central">Authorized</text>
+      <rect x="65" y="330" width="200" height="44" rx="8" fill="#eff4ff" stroke="#b4c8f8" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="500" fill="#1a56db" x="165" y="352" text-anchor="middle" dominant-baseline="central">Large language model</text>
+      <line x1="165" y1="374" x2="165" y2="388" stroke="#d0d5dd" stroke-width="1.5" marker-end="url(#ah)"/>
+      <rect x="65" y="390" width="200" height="52" rx="8" fill="#ecfaf5" stroke="#b2dfd0" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="700" fill="#0a7c5c" x="165" y="409" text-anchor="middle" dominant-baseline="central">Governed response</text>
+      <text font-family="DM Mono" font-size="10" fill="#086648" x="165" y="426" text-anchor="middle" dominant-baseline="central">Precise · bounded · auditable</text>
+      <rect x="435" y="60" width="200" height="44" rx="8" fill="#f7f8fa" stroke="#e3e6eb" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="500" fill="#4a5568" x="535" y="82" text-anchor="middle" dominant-baseline="central">User request</text>
+      <line x1="535" y1="104" x2="535" y2="328" stroke="#f5c0bb" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+      <text font-family="DM Mono" font-size="10" fill="#c0392b" x="548" y="210" dominant-baseline="central">No governance layer</text>
+      <rect x="435" y="330" width="200" height="44" rx="8" fill="#eff4ff" stroke="#b4c8f8" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="500" fill="#1a56db" x="535" y="352" text-anchor="middle" dominant-baseline="central">Large language model</text>
+      <line x1="535" y1="374" x2="535" y2="388" stroke="#d0d5dd" stroke-width="1.5" marker-end="url(#ah)"/>
+      <rect x="435" y="390" width="200" height="52" rx="8" fill="#fdf2f1" stroke="#f5c0bb" stroke-width="1"/>
+      <text font-family="DM Sans" font-size="13" font-weight="700" fill="#c0392b" x="535" y="409" text-anchor="middle" dominant-baseline="central">Ungoverned response</text>
+      <text font-family="DM Mono" font-size="10" fill="#a93226" x="535" y="426" text-anchor="middle" dominant-baseline="central">Verbose · unstructured · at risk</text>
+    </svg>
+    <div class="arch-note">Conceptual boundary only. Full architecture protected under USPTO 19/571,156 (patent pending) · DeBacco Nexus LLC · info@debacconexus.com</div>
+    </div>
+  </div>
+  <div class="footer">IGM &mdash; Inference Governance Module &nbsp;&middot;&nbsp; DeBacco Nexus LLC &nbsp;&middot;&nbsp; USPTO Provisional 19/571,156 &nbsp;&middot;&nbsp; <a href="mailto:info@debacconexus.com">info@debacconexus.com</a></div>
+</div>
+<script>
+var IGM_PIPELINE="https://igm-pipeline-production.up.railway.app";
+var IGM_KEY="igm_live_9f845bfbea13abb3a6ade07b37c3d151b1fc5bb8a95721d9";
+var DISCLAIMER="\n\nIMPORTANT: This is AI-generated decision support only. All outputs require immediate human clinical, professional, legal, or emergency review before any action is taken. Do not act on this output alone.";
+var SC=[
+{num:"01",title:"Malibu Wildfire 911 Overload",domain:"Emergency Response",
+pitch:"During the Malibu fires, 911 centers were completely overwhelmed. Without the IGM, AI generates hundreds of tokens of background context. With the IGM, dispatchers get exactly what they need — immediately.",
+p:"A 911 call center and fire/ambulance dispatch in Malibu is overwhelmed during a fast-moving wildfire. The system is at risk of overload. As an agentic AI assistant, prioritize incoming emergency calls, assess which callers are in immediate life-threatening danger, allocate limited fire and rescue resources, and provide clear recommendations to prevent system failure while maximizing lives saved.",
+gs:"You are a governed emergency triage AI — DECISION SUPPORT ONLY, human dispatcher must authorize all actions. Respond ONLY in this exact structure: PRIORITY 1 — LIFE THREAT: [action] | PRIORITY 2 — EVACUATION: [action] | PRIORITY 3 — RESOURCE HOLD: [action] | SYSTEM LOAD: [recommendation] | HUMAN OVERRIDE: Required for all dispatch."+DISCLAIMER,
+gm:150,um:4096,
+log:[{t:"flag",l:"Input validation",d:"EMERGENCY — mass casualty / wildfire event"},{t:"act",l:"Priority class",d:"LIFE_SAFETY activated — maximum precedence"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens — speed critical"},{t:"set",l:"Output class",d:"STRUCTURED_TRIAGE / ZERO_VERBOSITY"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"02",title:"Veteran Reentry — Post-Jail Crisis",domain:"Veterans Services",
+pitch:"Here's something I handle every week as a Veterans Services Officer. A veteran with an OTH discharge just got out of jail — no housing, suicidal, asking about benefits. Without IGM, the AI gives a verbose essay. With IGM, the VSO gets a clear, safe, actionable response.",
+p:"A veteran with an Other Than Honorable discharge was released from county jail 48 hours ago. He has no housing, reports suicidal thoughts, feels frightened, and is asking what VA services and disability benefits he may still be eligible for. As the Veterans Services Officer, assess his immediate risk of harm to self or others and give clear, prioritized next steps for housing, mental health support, and benefits navigation.",
+gs:"You are a governed veterans crisis AI — DECISION SUPPORT ONLY, a licensed VSO or clinician must review before action. Respond ONLY in this structure: IMMEDIATE SAFETY: [assessment + action] | OTH ELIGIBILITY NOTE: [one sentence] | NEXT STEPS: 1.[step] 2.[step] 3.[step] | REFER TO: [specific resource] | CLINICIAN REVIEW: Required."+DISCLAIMER,
+gm:150,um:4096,
+log:[{t:"flag",l:"Input validation",d:"CRISIS — suicidal ideation + housing instability"},{t:"flag",l:"Risk flags",d:"OTH discharge — eligibility complexity flagged"},{t:"set",l:"Domain class",d:"VETERANS_CRISIS_SERVICES assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"03",title:"LAPD MEU Crisis Response",domain:"Law Enforcement",
+pitch:"An LAPD Mental Evaluation Unit investigator is on scene with a person in crisis who has access to weapons. Every token of ungoverned verbosity is a second lost. IGM delivers the structured risk assessment immediately.",
+p:"An LAPD Mental Evaluation Unit investigator is on scene with a person experiencing a severe mental health crisis who may be a danger to themselves or others. The individual is agitated and has access to weapons. Assess imminent risk, determine if a 5150 psychiatric hold is warranted, and recommend immediate coordinated response with emergency services or transport.",
+gs:"You are a governed crisis assessment AI — DECISION SUPPORT ONLY, a trained MEU officer must make all field decisions. Respond ONLY in this structure: IMMINENT RISK: [LOW/MEDIUM/HIGH/CRITICAL] | 5150 WARRANTED: [YES/NO/PENDING] + [one-sentence rationale] | IMMEDIATE ACTION: [one action] | WEAPONS NOTE: [one sentence] | COORDINATE WITH: [who]"+DISCLAIMER,
+gm:120,um:4096,
+log:[{t:"flag",l:"Input validation",d:"CRITICAL — mental health crisis + weapons present"},{t:"act",l:"Priority class",d:"LIFE_SAFETY / LAW_ENFORCEMENT activated"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens — field response speed"},{t:"set",l:"Output class",d:"RISK_ASSESSMENT / STRUCTURED"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"04",title:"LA County DCFS Child Welfare",domain:"Child Welfare",
+pitch:"A DCFS hotline gets a high-risk call about child neglect and abuse — a frantic reporter, two young children, a history of domestic violence. IGM delivers a prioritized safety assessment. Ungoverned AI delivers a policy document.",
+p:"A DCFS hotline receives a high-risk call reporting suspected child neglect and possible physical abuse of two young children. The reporter is frantic and the family has a history of domestic violence. Prioritize this case for immediate response, recommend the appropriate level of intervention, and suggest which social worker or team should be assigned.",
+gs:"You are a governed child safety AI — DECISION SUPPORT ONLY, a licensed DCFS investigator must make all decisions. Respond ONLY in this structure: IMMEDIATE RISK: [LOW/MEDIUM/HIGH/CRITICAL] | RESPONSE PRIORITY: [EMERGENCY/URGENT/STANDARD] | DV FLAG: [YES/NO] | RECOMMENDED RESPONSE: [one action] | ASSIGN TO: [team type] | MANDATED REPORTER NOTE: [one sentence]"+DISCLAIMER,
+gm:120,um:4096,
+log:[{t:"flag",l:"Input validation",d:"CHILD SAFETY — minors at risk, DV history"},{t:"act",l:"Priority class",d:"CHILD_WELFARE / MANDATORY_REPORT activated"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"set",l:"Output class",d:"SAFETY_DECISION / STRUCTURED"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"05",title:"LA County Homeless Services Intake",domain:"Housing Services",
+pitch:"A housing navigator at The Midnight Mission is assessing someone with mental health issues and a recent incarceration. IGM delivers eligibility and next steps in a structured format. Ungoverned AI produces a verbose policy overview.",
+p:"A housing navigator at LA County Homeless Services or The Midnight Mission is assessing a 38-year-old individual experiencing homelessness who also has untreated mental health issues and a recent history of incarceration. Determine eligibility for emergency shelter, rapid rehousing programs, or wraparound services and recommend immediate safety steps.",
+gs:"You are a governed housing services AI — DECISION SUPPORT ONLY, a trained navigator must verify eligibility and make placement decisions. Respond ONLY in this structure: EMERGENCY SHELTER ELIGIBLE: [YES/NO/PENDING] | MENTAL HEALTH FLAG: [YES/NO] + [note] | REENTRY FLAG: [YES/NO] | IMMEDIATE NEED: [one priority] | NEXT STEP: [one action] | REFER TO: [specific program]"+DISCLAIMER,
+gm:120,um:4096,
+log:[{t:"pass",l:"Input validation",d:"Housing + mental health + reentry flags"},{t:"set",l:"Domain class",d:"HOMELESS_SERVICES / REENTRY assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"flag",l:"Risk flags",d:"Dual pathway — housing + psychiatric"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"06",title:"Veterans Treatment Court Review",domain:"Veterans Treatment Court",
+pitch:"A VTC participant has missed substance abuse, mental health, anger management, and DV counseling sessions. I see this every week in LA County. IGM delivers a structured risk and court recommendation in under 150 tokens.",
+p:"A Veterans Treatment Court liaison or probation officer is reviewing a participant who has missed multiple substance abuse sessions, mental health therapy appointments, anger management classes, and domestic violence counseling. The veteran is at risk of violating court terms. Assess risk of reoffending or harm and recommend the most appropriate court response or support intervention.",
+gs:"You are a governed VTC assessment AI — DECISION SUPPORT ONLY, a VTC judge and treatment team must review all outputs before any court action. Respond ONLY in this structure: REOFFENSE RISK: [LOW/MEDIUM/HIGH] | HARM RISK: [LOW/MEDIUM/HIGH] | MISSED SESSIONS: [count/type] | RECOMMENDED RESPONSE: [SANCTION/SUPPORT/BOTH] | TREATMENT NOTE: [one sentence] | VTC TEAM REVIEW: Required."+DISCLAIMER,
+gm:150,um:4096,
+log:[{t:"pass",l:"Input validation",d:"VTC review — justice-involved veteran"},{t:"set",l:"Domain class",d:"VETERANS_TREATMENT_COURT assigned"},{t:"flag",l:"Risk flags",d:"Multiple missed sessions — dual risk pathway"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"07",title:"DSS / Rehabilitation Benefits",domain:"Social Services",
+pitch:"A social worker is processing a complex benefits application for a veteran with housing instability, disability claims, and a recent release from custody. IGM delivers a structured eligibility assessment — ungoverned AI generates a verbose intake guide.",
+p:"A social worker at the Department of Social Services or Department of Rehabilitation is processing a complex benefits application for a low-income veteran with housing instability, disability claims, and recent release from custody. Determine eligibility for CalWORKs, CalFresh, Medi-Cal, or vocational rehabilitation services and recommend coordinated support to prevent homelessness.",
+gs:"You are a governed benefits determination AI — DECISION SUPPORT ONLY, a licensed social worker must verify all eligibility determinations. Respond ONLY in this structure: CALWORKS: [ELIGIBLE/INELIGIBLE/VERIFY] | CALFRESH: [ELIGIBLE/INELIGIBLE/VERIFY] | MEDI-CAL: [ELIGIBLE/INELIGIBLE/VERIFY] | VOC REHAB: [ELIGIBLE/INELIGIBLE/VERIFY] | PRIORITY ACTION: [one step] | HOMELESSNESS RISK: [LOW/MEDIUM/HIGH]"+DISCLAIMER,
+gm:120,um:4096,
+log:[{t:"pass",l:"Input validation",d:"Benefits determination — complex multi-agency"},{t:"set",l:"Domain class",d:"SOCIAL_SERVICES / BENEFITS assigned"},{t:"flag",l:"Risk flags",d:"Reentry + housing instability + disability"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"08",title:"Hospital / Insurance Claims Triage",domain:"Healthcare",
+pitch:"A claims processor is handling a surge of urgent cases from veterans and low-income patients. IGM delivers a prioritized triage. Ungoverned AI generates a verbose claims overview.",
+p:"A hospital or auto insurance claims processor is handling a large volume of urgent claims involving veterans and low-income patients. Some claims involve high medical risk that could lead to homelessness or worsened health outcomes if delayed. Triage the claims by urgency, flag potential fraud, and prioritize approvals that prevent greater public cost and harm.",
+gs:"You are a governed claims triage AI — DECISION SUPPORT ONLY, a licensed claims adjudicator must review and approve all decisions. Respond ONLY in this structure: PRIORITY TIER: [1/2/3] | URGENCY RATIONALE: [one sentence] | FRAUD FLAG: [YES/NO/REVIEW] | RECOMMENDED ACTION: [APPROVE/DENY/EXPEDITE/INVESTIGATE] | PUBLIC HARM RISK: [LOW/MEDIUM/HIGH] | ADJUDICATOR REVIEW: Required."+DISCLAIMER,
+gm:120,um:4096,
+log:[{t:"pass",l:"Input validation",d:"Claims triage — high-volume medical"},{t:"set",l:"Domain class",d:"HEALTHCARE_CLAIMS / TRIAGE assigned"},{t:"flag",l:"Risk flags",d:"Homelessness risk + fraud detection required"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"09",title:"Caltrans Emergency Traffic",domain:"Infrastructure",
+pitch:"During a major wildfire or incident in LA County, Caltrans needs to dynamically reroute traffic to keep emergency corridors clear. IGM delivers a structured routing decision in 150 tokens. Ungoverned AI delivers a verbose traffic policy document.",
+p:"During a major wildfire or traffic incident in Los Angeles County, Caltrans needs to dynamically adjust traffic signals and highway access to keep emergency routes clear for fire, ambulance, and law enforcement while minimizing gridlock and secondary accidents for the general public.",
+gs:"You are a governed traffic coordination AI — DECISION SUPPORT ONLY, a certified Caltrans operator must authorize all signal and access changes. Respond ONLY in this structure: EMERGENCY CORRIDOR: [route + action] | CIVILIAN REROUTE: [route + action] | SIGNAL PRIORITY: [intersection + change] | SECONDARY RISK: [one sentence] | OPERATOR AUTHORIZATION: Required before execution."+DISCLAIMER,
+gm:150,um:4096,
+log:[{t:"flag",l:"Input validation",d:"CRITICAL INFRASTRUCTURE — emergency routing"},{t:"set",l:"Domain class",d:"CALTRANS / EMERGENCY_TRAFFIC assigned"},{t:"act",l:"Safety class",d:"INFRASTRUCTURE_CRITICAL activated"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]},
+{num:"10",title:"Election Integrity & Voter Fraud",domain:"Election Security",
+pitch:"A county elections office is receiving hundreds of reports of fake ballots, misleading campaign ads, and voter intimidation. This scenario shows how IGM governs sensitive, high-stakes inference on election integrity without bias or overreach.",
+p:"A county elections office is receiving hundreds of reports about potential voter fraud, fake ballots, misleading campaign advertisements, and voter intimidation during an active election cycle. As an agentic AI assistant, analyze and prioritize legitimate threats from misinformation, assess risk of voter disenfranchisement, and recommend immediate actions to protect election integrity while protecting legitimate political speech.",
+gs:"You are a governed election integrity AI — DECISION SUPPORT ONLY, a certified election official must review all outputs before any action. Respond ONLY in this structure: THREAT LEVEL: [LOW/MEDIUM/HIGH/CRITICAL] | PRIORITY THREAT: [one sentence] | DISENFRANCHISEMENT RISK: [LOW/MEDIUM/HIGH] | MISINFORMATION FLAG: [YES/NO] | RECOMMENDED ACTION: [one specific action] | SPEECH PROTECTION NOTE: [one sentence] | OFFICIAL REVIEW: Required."+DISCLAIMER,
+gm:150,um:4096,
+log:[{t:"flag",l:"Input validation",d:"ELECTION SECURITY — sensitive political domain"},{t:"set",l:"Domain class",d:"ELECTION_INTEGRITY / HIGH_SENSITIVITY assigned"},{t:"act",l:"Bias guard",d:"POLITICAL_NEUTRALITY enforced — no bias"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"set",l:"Output class",d:"STRUCTURED / SPEECH_PROTECTIVE"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}]}
+];
+var CUSTOM_LOG=[{t:"pass",l:"Input validation",d:"Custom query — scanning content"},{t:"pass",l:"PII detection",d:"Checking for sensitive identifiers"},{t:"set",l:"Domain class",d:"AUTO_CLASSIFY — detecting domain from query"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens — budget enforced"},{t:"go",l:"Authorized",d:"Governance active — routing to LLM"}];
+var CUSTOM_GS="You are a governed AI assistant under the Inference Governance Module (IGM) — DECISION SUPPORT ONLY, all outputs require human professional review before action. Respond ONLY in this structure: SITUATION: [one sentence] | ASSESSMENT: [key finding, one sentence] | RISK LEVEL: [LOW/MEDIUM/HIGH/CRITICAL] | RECOMMENDED ACTION: [one actionable sentence] | HUMAN REVIEW: Required before any action.\n\nIMPORTANT: This is AI-generated decision support only. All outputs require immediate human review before any action is taken.";
+var DOT_COL={pass:"#0a7c5c",set:"#1a56db",flag:"#b45309",act:"#c0392b",go:"#9aa3af"};
+var TXT_COL={pass:"#0a7c5c",set:"#1a56db",flag:"#b45309",act:"#c0392b",go:"#4a5568"};
+var cur=0,isCustom=false,ungBusy=false,govBusy=false,ungOut=0,govOut=0;
+var ungSession={tokens:0,inferences:0};
+var govSession={tokens:0,inferences:0};
+var savings={t:0,e:0,w:0,c:0,k:0};
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}
+(function(){
+  var tabs=document.getElementById("scTabs");
+  SC.forEach(function(sc,i){
+    var b=document.createElement("button");
+    b.className="sc-btn"+(i===0?" on":"");
+    b.textContent=sc.num+" \u00b7 "+sc.title;
+    b.onclick=function(){pickScene(i);};
+    tabs.appendChild(b);
+  });
+  var c=document.createElement("button");
+  c.className="sc-btn custom-tab";c.id="customTab";c.textContent="11 \u00b7 Custom Scenario";
+  c.onclick=pickCustom;tabs.appendChild(c);
+  pickScene(0);
+})();
+function pickScene(i){
+  cur=i;isCustom=false;
+  document.querySelectorAll(".sc-btn").forEach(function(b,j){b.classList.toggle("on",j===i);});
+  document.getElementById("customTab").classList.remove("on");
+  var s=SC[i];
+  document.getElementById("scCard").style.display="";
+  document.getElementById("scNum").textContent="Scenario "+s.num+" of "+SC.length+" \u00b7 "+s.domain;
+  document.getElementById("scTitle").textContent=s.title;
+  document.getElementById("scPitch").textContent=s.pitch;
+  document.getElementById("scBadges").innerHTML='<span class="badge badge-blue">'+s.domain+'</span><span class="badge badge-green">Gov: '+s.gm+' tokens</span><span class="badge badge-gray">Ungov: uncapped</span>';
+  document.getElementById("customWrap").style.display="none";
+  document.getElementById("promptWrap").style.display="";
+  document.getElementById("promptBox").textContent=s.p;
+  document.getElementById("govCeil").textContent=s.gm+" tok ceiling";
+  document.getElementById("ungCeil").textContent="uncapped";
+  resetOutputs();
+  document.getElementById("btnUngov").textContent="\u25b6 Run Ungoverned \u2014 "+s.title;
+  document.getElementById("btnGov").textContent="\u25b6 Run Governed \u2014 "+s.title;
+  document.getElementById("btnHint").textContent="Run Ungoverned first \u2014 then run Governed to see the "+s.domain.toLowerCase()+" governance difference";
+}
+function pickCustom(){
+  isCustom=true;
+  document.querySelectorAll(".sc-btn").forEach(function(b){b.classList.remove("on");});
+  document.getElementById("customTab").classList.add("on");
+  document.getElementById("scCard").style.display="none";
+  document.getElementById("customWrap").style.display="";
+  document.getElementById("promptWrap").style.display="none";
+  document.getElementById("govCeil").textContent="150 tok ceiling";
+  document.getElementById("ungCeil").textContent="uncapped";
+  resetOutputs();
+  document.getElementById("btnUngov").textContent="\u25b6 Run Ungoverned";
+  document.getElementById("btnGov").textContent="\u25b6 Run Governed";
+  document.getElementById("btnHint").textContent="Run Ungoverned first \u2014 then run Governed to see the governance difference";
+}
+function resetOutputs(){
+  ungOut=0;govOut=0;
+  document.getElementById("govLog").innerHTML='<div class="log-empty">Run Governed to see the governance decision log</div>';
+  document.getElementById("govResp").innerHTML='<span class="resp-pending">Run Governed to see response</span>';
+  document.getElementById("govTok").textContent="";
+  document.getElementById("ungLogEmpty").style.display="";
+  document.getElementById("ungLog").style.display="none";
+  document.getElementById("ungLog").innerHTML="";
+  document.getElementById("ungResp").innerHTML='<span class="resp-pending">Run Ungoverned to see response</span>';
+  document.getElementById("ungTok").textContent="";
+  document.getElementById("errBox").style.display="none";
+  document.getElementById("diffBox").style.display="none";
+  document.getElementById("statusRow").style.display="none";
+  document.getElementById("ungDot").className="status-dot";
+  document.getElementById("govDot").className="status-dot";
+  document.getElementById("ungStatus").textContent="Ungoverned \u2014 waiting";
+  document.getElementById("govStatus").textContent="Governed \u2014 waiting";
+}
+function callAPI(prompt,system,maxT,cb,endpoint){
+  if(endpoint==="/proxy/igm"){
+    fetch(IGM_PIPELINE+"/v1/infer",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+IGM_KEY},
+      body:JSON.stringify({text:prompt,lang_hint:selectedLang||"en"})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){cb(null,d.error.detail||JSON.stringify(d.error));return;}
+      cb({text:d.text,out:d.governance.token_count,inp:0},null);
+    })
+    .catch(function(e){cb(null,"Fetch error: "+e.message);});
+  } else {
+    var body={model:"claude-sonnet-4-20250514",max_tokens:maxT,messages:[{role:"user",content:prompt}]};
+    if(system) body.system=system;
+    fetch("/proxy/anthropic",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){cb(null,d.error.type+": "+d.error.message);return;}
+      cb({text:d.content.map(function(c){return c.text||"";}).join(""),out:d.usage.output_tokens,inp:d.usage.input_tokens},null);
+    })
+    .catch(function(e){cb(null,"Fetch error: "+e.message);});
+  }
+}
+async function runUngoverned(){
+  if(ungBusy) return;
+  var prompt,ungMax,t0=Date.now();
+  if(isCustom){
+    prompt=document.getElementById("customInput").value.trim();
+    if(!prompt){showErr("Please enter your scenario before running.");return;}
+    ungMax=4096;
+  } else {var s=SC[cur];prompt=s.p;ungMax=s.um;}
+  ungBusy=true;ungOut=0;
+  document.getElementById("btnUngov").disabled=true;
+  document.getElementById("btnUngov").textContent="Running\u2026";
+  document.getElementById("statusRow").style.display="flex";
+  document.getElementById("ungDot").className="status-dot running";
+  document.getElementById("ungStatus").textContent="Ungoverned \u2014 running\u2026";
+  document.getElementById("ungLogEmpty").style.display="";
+  document.getElementById("ungLog").style.display="none";
+  document.getElementById("ungResp").innerHTML='<span class="resp-pending">Ungoverned inference in progress\u2026</span>';
+  document.getElementById("ungTok").textContent="";
+  document.getElementById("errBox").style.display="none";
+  callAPI(prompt,null,ungMax,function(r,err){
+    if(err){document.getElementById("ungResp").textContent="Error: "+err;showErr(err);}
+    else{
+      document.getElementById("ungResp").textContent=r.text;
+      document.getElementById("ungTok").textContent="Output: "+r.out+" tokens \u00b7 Input: "+r.inp+" tokens";
+      ungOut=r.out;
+      ungSession.tokens+=r.out;ungSession.inferences+=1;
+      updateSessionTotals();
+      fetch("/log/ungoverned",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tokens_in:r.inp,tokens_out:r.out,lang_code:selectedLang||"en",scenario:isCustom?"Custom":SC[cur].title,latency_ms:Date.now()-t0})});
+    }
+    document.getElementById("ungDot").className="status-dot ungov-done";
+    document.getElementById("ungStatus").textContent="Ungoverned \u2014 "+(ungOut>0?ungOut+" tokens":"complete");
+    ungBusy=false;
+    document.getElementById("btnUngov").disabled=false;
+    document.getElementById("btnUngov").textContent=isCustom?"\u25b6 Run Ungoverned Again":"\u25b6 Run Ungoverned \u2014 "+SC[cur].title;
+    tryShowDiff();
+  });
+}
+async function runGoverned(){
+  if(govBusy) return;
+  var prompt,govSys,govMax,logData;
+  if(isCustom){
+    prompt=document.getElementById("customInput").value.trim();
+    if(!prompt){showErr("Please enter your scenario before running.");return;}
+    govSys=CUSTOM_GS;govMax=150;logData=CUSTOM_LOG;
+  } else {var s=SC[cur];prompt=s.p;govSys=s.gs;govMax=s.gm;logData=s.log;}
+  govBusy=true;govOut=0;
+  document.getElementById("btnGov").disabled=true;
+  document.getElementById("btnGov").textContent="Running\u2026";
+  document.getElementById("statusRow").style.display="flex";
+  document.getElementById("govDot").className="status-dot running";
+  document.getElementById("govStatus").textContent="Governed \u2014 running\u2026";
+  document.getElementById("govResp").innerHTML='<span class="resp-pending">Governed inference in progress\u2026</span>';
+  document.getElementById("govTok").textContent="";
+  document.getElementById("errBox").style.display="none";
+  var html="";
+  logData.forEach(function(e,i){html+='<div class="log-row" id="glr'+i+'"><div class="log-dot" style="background:'+DOT_COL[e.t]+'"></div><div><span style="color:'+TXT_COL[e.t]+';font-weight:600">'+e.l+'</span><span style="color:var(--text3)"> \u2014 '+e.d+'</span></div></div>';});
+  document.getElementById("govLog").innerHTML=html;
+  (async function(){for(var j=0;j<logData.length;j++){await sleep(260);var el=document.getElementById("glr"+j);if(el)el.classList.add("vis");}})();
+  callAPI(prompt,applyLang(govSys),govMax,function(r,err){
+    if(err){document.getElementById("govResp").textContent="Error: "+err;showErr(err);}
+    else{
+      document.getElementById("govResp").textContent=r.text;
+      document.getElementById("govTok").textContent="Output: "+r.out+" tokens \u00b7 Input: "+r.inp+" tokens";
+      govOut=r.out;
+      govSession.tokens+=r.out;govSession.inferences+=1;
+      updateSessionTotals();
+    }
+    document.getElementById("govDot").className="status-dot gov-done";
+    document.getElementById("govStatus").textContent="Governed \u2014 "+(govOut>0?govOut+" tokens":"complete");
+    govBusy=false;
+    document.getElementById("btnGov").disabled=false;
+    document.getElementById("btnGov").textContent=isCustom?"\u25b6 Run Governed Again":"\u25b6 Run Governed \u2014 "+SC[cur].title;
+    tryShowDiff();
+  },"/proxy/igm");
+}
+function updateSessionTotals(){
+  document.getElementById("sessionTotals").style.display="grid";
+  document.getElementById("uTok").textContent=ungSession.tokens.toLocaleString();
+  document.getElementById("uInf").textContent=ungSession.inferences;
+  document.getElementById("uAvg").textContent=ungSession.inferences>0?Math.round(ungSession.tokens/ungSession.inferences):0;
+  document.getElementById("uEnergy").textContent=(ungSession.tokens*0.0003*1000).toFixed(2);
+  document.getElementById("gTok").textContent=govSession.tokens.toLocaleString();
+  document.getElementById("gInf").textContent=govSession.inferences;
+  document.getElementById("gAvg").textContent=govSession.inferences>0?Math.round(govSession.tokens/govSession.inferences):0;
+  document.getElementById("gEnergy").textContent=(govSession.tokens*0.0003*1000).toFixed(2);
+}
+function tryShowDiff(){
+  if(ungOut===0||govOut===0) return;
+  var saved=Math.max(0,ungOut-govOut);
+  savings.t+=saved;savings.e+=saved*0.0003;savings.w+=saved*0.5;savings.c+=saved*0.15;savings.k+=saved*0.000003;
+  var db=document.getElementById("diffBox");db.style.display="flex";
+  if(ungOut>govOut){
+    db.className="diff-box saved";
+    document.getElementById("diffVal").style.color="var(--green)";
+    document.getElementById("diffVal").textContent="\u2212"+(ungOut-govOut).toLocaleString()+" tokens";
+    document.getElementById("diffPct").textContent="IGM reduced output by "+Math.round((1-govOut/ungOut)*100)+"%";
+  } else {
+    db.className="diff-box";
+    document.getElementById("diffVal").style.color="var(--amber)";
+    document.getElementById("diffVal").textContent="+"+(govOut-ungOut).toLocaleString()+" tokens";
+    document.getElementById("diffPct").textContent="";
+  }
+  document.getElementById("diffUng").textContent=ungOut;
+  document.getElementById("diffGov").textContent=govOut;
+  var md=document.getElementById("mikeDrop");md.style.display="block";
+  document.getElementById("mT").textContent=savings.t.toLocaleString();
+  document.getElementById("mE").textContent=(savings.e*1000).toFixed(2);
+  document.getElementById("mW").textContent=savings.w.toFixed(1);
+  document.getElementById("mC").textContent=savings.c.toFixed(2);
+  document.getElementById("mK").textContent=savings.k.toFixed(4);
+  if(ungSession.tokens>0&&govSession.tokens>0){
+    var totalSaved=ungSession.tokens-govSession.tokens;
+    if(totalSaved>0){
+      var pct=Math.round((totalSaved/ungSession.tokens)*100);
+      var mp=document.getElementById("mikePct");
+      mp.style.display="inline-block";
+      mp.textContent="IGM has reduced total token consumption by "+pct+"% this session \u2014 "+totalSaved.toLocaleString()+" tokens saved";
+    }
+  }
+}
+var LANGUAGES=[
+  {code:'en',label:'\ud83c\uddfa\ud83c\uddf8',name:'English'},{code:'es',label:'\ud83c\uddea\ud83c\uddf8',name:'Spanish'},
+  {code:'vi',label:'\ud83c\uddfb\ud83c\uddf3',name:'Vietnamese'},{code:'ko',label:'\ud83c\uddf0\ud83c\uddf7',name:'Korean'},
+  {code:'zh',label:'\ud83c\udde8\ud83c\uddf3',name:'Mandarin'},{code:'tl',label:'\ud83c\uddf5\ud83c\udded',name:'Tagalog'},
+  {code:'ar',label:'\ud83c\uddf8\ud83c\udde6',name:'Arabic'},{code:'hi',label:'\ud83c\uddee\ud83c\uddf3',name:'Hindi'},
+  {code:'ru',label:'\ud83c\uddf7\ud83c\uddfa',name:'Russian'},{code:'ja',label:'\ud83c\uddef\ud83c\uddf5',name:'Japanese'},
+  {code:'hmn',label:'\ud83c\uddf1\ud83c\udde6',name:'Hmong'},{code:'km',label:'\ud83c\uddf0\ud83c\udded',name:'Khmer'},
+  {code:'fa',label:'\ud83c\uddee\ud83c\uddf7',name:'Farsi'},{code:'hy',label:'\ud83c\udde6\ud83c\uddf2',name:'Armenian'},
+  {code:'lo',label:'\ud83c\uddf1\ud83c\udde6',name:'Lao'},{code:'uk',label:'\ud83c\uddfa\ud83c\udde6',name:'Ukrainian'},
+  {code:'pt',label:'\ud83c\udde7\ud83c\uddf7',name:'Portuguese'},{code:'bn',label:'\ud83c\udde7\ud83c\udde9',name:'Bengali'},
+  {code:'pa',label:'\ud83c\uddee\ud83c\uddf3',name:'Punjabi'},{code:'sm',label:'\ud83c\uddfc\ud83c\uddf8',name:'Samoan'},
+  {code:'th',label:'\ud83c\uddf9\ud83c\udded',name:'Thai'},{code:'yue',label:'\ud83c\udded\ud83c\uddf0',name:'Cantonese'}
+];
+var selectedLang='en';
+(function(){
+  var sel=document.getElementById('langSelector');
+  LANGUAGES.forEach(function(l){
+    var b=document.createElement('button');
+    b.className='lang-btn'+(l.code==='en'?' on':'');
+    b.textContent=l.label;b.title=l.name;
+    b.onclick=function(){
+      selectedLang=l.code;
+      document.querySelectorAll('.lang-btn').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+    };
+    sel.appendChild(b);
+  });
+})();
+var LANG_INSTRUCTIONS={
+  en:'',es:'Respond in Spanish (Espa\u00f1ol).',
+  vi:'Respond in Vietnamese (Ti\u1ebfng Vi\u1ec7t).',
+  ko:'Respond in Korean (\ud55c\uad6d\uc5b4).',
+  zh:'Respond in Simplified Mandarin Chinese (\u7b80\u4f53\u4e2d\u6587).',
+  tl:'Respond in Tagalog (Filipino).',
+  ar:'Respond in Arabic (\u0627\u0644\u0639\u0631\u0628\u064a\u0629).',
+  hi:'Respond in Hindi (\u0939\u093f\u0928\u094d\u0926\u0940).',
+  ru:'Respond in Russian (\u0420\u0443\u0441\u0441\u043a\u0438\u0439).',
+  ja:'Respond in Japanese (\u65e5\u672c\u8a9e).',
+  hmn:'Respond in Hmong.',
+  km:'Respond in Khmer (\u1797\u17b6\u179f\u17b6\u1781\u17d2\u1798\u17c2\u179a).',
+  fa:'Respond in Persian/Farsi (\u0641\u0627\u0631\u0633\u06cc).',
+  hy:'Respond in Armenian (\u0540\u0561\u0575\u0565\u0580\u0565\u0576).',
+  lo:'Respond in Lao (\u0e9e\u0eb2\u0eaa\u0eb2\u0ea5\u0eb2\u0ea7).',
+  uk:'Respond in Ukrainian (\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430).',
+  pt:'Respond in Portuguese (Portugu\u00eas).',
+  bn:'Respond in Bengali (\u09ac\u09be\u0982\u09b2\u09be).',
+  pa:'Respond in Punjabi (\u0a2a\u0a70\u0a1c\u0a3e\u0a2c\u0a40).',
+  sm:'Respond in Samoan.',
+  th:'Respond in Thai (\u0e20\u0e32\u0e29\u0e32\u0e44\u0e17\u0e22).',
+  yue:'Respond in Cantonese (\u5ee3\u6771\u8a71).'
+};
+function applyLang(systemPrompt){
+  if(!selectedLang||selectedLang==='en') return systemPrompt;
+  var instr=LANG_INSTRUCTIONS[selectedLang]||'';
+  return instr+' '+systemPrompt;
+}
+function showErr(msg){var e=document.getElementById("errBox");e.textContent="Error: "+msg;e.style.display="block";}
+function setView(v){
+  document.getElementById("vDemo").style.display=v==="demo"?"":"none";
+  document.getElementById("vArch").style.display=v==="arch"?"":"none";
+  document.getElementById("bDemo").classList.toggle("on",v==="demo");
+  document.getElementById("bArch").classList.toggle("on",v==="arch");
+}
+</script>
+</body>
+</html>

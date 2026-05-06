@@ -1,0 +1,48 @@
+PROPRIETARY SOFTWARE LICENSE
+DeBacco Nexus LLC
+
+Copyright (c) 2026 DeBacco Nexus LLC. All Rights Reserved.
+
+NOTICE: This software and the underlying architecture, methodology, and 
+governance framework it demonstrates are the exclusive intellectual property 
+of DeBacco Nexus LLC and James DeBacco.
+
+PATENT PENDING: The Inference Governance Module (IGM) architecture is 
+protected under USPTO Patent Application 19/571,156. Unauthorized use, 
+reproduction, or implementation of the IGM architecture or any substantially 
+similar governance boundary system is strictly prohibited.
+
+This repository contains a demonstration layer only. The full IGM architecture, 
+implementation details, governance boundary mechanisms, token ceiling enforcement 
+methodology, and related systems are NOT disclosed herein and are protected under 
+the above patent application.
+
+RESTRICTIONS:
+1. You may NOT copy, modify, distribute, or create derivative works of this 
+   software or the underlying IGM architecture without express written permission 
+   from DeBacco Nexus LLC.
+
+2. You may NOT implement, replicate, or reverse-engineer the IGM governance 
+   boundary architecture described or demonstrated by this software.
+
+3. You may NOT use this software or any portion thereof for commercial purposes 
+   without a valid license agreement with DeBacco Nexus LLC.
+
+4. Viewing this demonstration does not grant any license, express or implied, 
+   to the underlying IGM architecture or any related intellectual property.
+
+PERMITTED:
+- Viewing the live demonstration at https://igm-demo.onrender.com
+- Sharing the live demonstration URL for research and educational purposes
+- Referencing this work in academic or research publications with proper citation
+
+CITATION:
+DeBacco, J. (2026). Inference Governance Module (IGM). DeBacco Nexus LLC. 
+USPTO Application 19/571,156. https://igm-demo.onrender.com
+
+For licensing inquiries, partnership discussions, or research collaboration:
+info@debacconexus.com
+
+DeBacco Nexus LLC
+Los Angeles, California
+info@debacconexus.com

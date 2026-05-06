@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IGM Admin • DeBacco Nexus LLC</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#ffffff;--bg2:#f7f8fa;--bg3:#eef0f3;
+      --border:#e3e6eb;--border2:#d0d5dd;
+      --text:#0d1117;--text2:#4a5568;--text3:#9aa3af;
+      --green:#0a7c5c;--green-light:#ecfaf5;--green-border:#b2dfd0;
+      --red:#c0392b;--red-light:#fdf2f1;--red-border:#f5c0bb;
+      --blue:#1a56db;--blue-light:#eff4ff;--blue-border:#b4c8f8;
+      --amber:#b45309;--amber-light:#fffbeb;
+      --sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+      --radius:8px;--radius-lg:12px;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+      --shadow:0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+    .header{border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100;box-shadow:var(--shadow-sm)}
+    .header-left{display:flex;flex-direction:column;gap:2px}
+    .header-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+    .header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+    .header-right{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;color:var(--text3)}
+    .status-live{display:flex;align-items:center;gap:5px;color:var(--green);font-weight:500}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .refresh-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:var(--radius);cursor:pointer;transition:all .15s}
+    .refresh-btn:hover{background:var(--bg3);border-color:var(--border2)}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 24px 80px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .grid-3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin-bottom:20px}
+    .card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm)}
+    .card-title{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+    .stat-value{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--text);line-height:1;margin-bottom:3px}
+    .stat-label{font-size:12px;color:var(--text3)}
+    table{width:100%;border-collapse:collapse}
+    th{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border)}
+    td{font-size:13px;padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--bg2)}
+    .mono{font-family:var(--mono);font-size:12px}
+    .badge{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500}
+    .badge-pass{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+    .badge-fail{background:var(--red-light);color:var(--red);border:1px solid var(--red-border)}
+    .badge-pro{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border)}
+    .badge-free{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+    .health-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .health-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius)}
+    .health-name{font-family:var(--mono);font-size:11px;color:var(--text2)}
+    .health-ok{font-family:var(--mono);font-size:11px;color:var(--green)}
+    .health-warn{font-family:var(--mono);font-size:11px;color:var(--amber)}
+    .health-err{font-family:var(--mono);font-size:11px;color:var(--red)}
+    .lang-item{margin-bottom:10px}
+    .lang-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+    .lang-code{font-family:var(--mono);color:var(--blue);font-weight:500}
+    .lang-name{color:var(--text3)}
+    .lang-count{font-family:var(--mono);color:var(--text2)}
+    .lang-bar-bg{background:var(--bg3);border-radius:2px;height:4px}
+    .lang-bar{background:var(--green);border-radius:2px;height:4px;transition:width .6s ease}
+    .cal-day{padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px}
+    .cal-date{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+    .cal-stats{display:flex;gap:14px;flex-wrap:wrap}
+    .cal-stat{font-size:12px;color:var(--text2)}
+    .cal-stat strong{font-family:var(--mono);color:var(--text);font-weight:500}
+    .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .usage-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px}
+    .usage-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+    .usage-value{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--text)}
+    .new-key-btn{background:var(--bg2);border:1px solid var(--border);color:var(--blue);font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s;font-weight:500}
+    .new-key-btn:hover{background:var(--blue-light);border-color:var(--blue-border)}
+    .loading{color:var(--text3);font-family:var(--mono);font-size:12px;padding:16px 0;text-align:center}
+    .error-banner{background:var(--red-light);border:1px solid var(--red-border);color:var(--red);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:var(--radius);margin-bottom:16px;display:none}
+    .footer{text-align:center;padding:24px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:24px}
+    .info-btn{background:none;border:1px solid var(--border);border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;color:var(--text3);display:inline-flex;align-items:center;justify-content:center;margin-left:6px;transition:all .15s;font-family:var(--mono);vertical-align:middle}
+    .info-btn:hover{background:var(--blue-light);border-color:var(--blue);color:var(--blue)}
+    .panel-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:200}
+    .panel-overlay.open{display:block}
+    .info-panel{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:var(--bg);border-left:1px solid var(--border);box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:201;transition:right .3s ease;overflow-y:auto;padding:28px}
+    .info-panel.open{right:0}
+    .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .panel-title{font-size:15px;font-weight:700;color:var(--text)}
+    .panel-close{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text2);font-family:var(--mono)}
+    .panel-close:hover{background:var(--bg3)}
+    .panel-section{margin-bottom:24px}
+    .panel-section-title{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .module-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:6px;margin-bottom:6px;background:var(--bg2);border:1px solid var(--border)}
+    .module-name{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);min-width:120px;padding-top:1px}
+    .module-desc{font-size:12px;color:var(--text2);line-height:1.5}
+    .legend-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);margin-bottom:8px}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    @media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">DeBacco Nexus LLC</div>
+    <div class="header-title">IGM Admin</div>
+  </div>
+  <div class="header-right">
+    <span class="status-live"><span class="status-dot"></span><span id="status-text">live</span></span>
+    <span id="current-date"></span>
+    <span id="countdown">auto-refresh in 30s</span>
+    <button class="refresh-btn" onclick="loadAll()">↺ refresh</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div id="error-banner" class="error-banner"></div>
+
+  <div class="grid-4">
+    <div class="card"><div class="card-title">Estimated Revenue</div><div class="stat-value" id="kpi-revenue">—</div><div class="stat-label">current month</div></div>
+    <div class="card"><div class="card-title">Governance Units</div><div class="stat-value" id="kpi-gu">—</div><div class="stat-label">governed inferences</div></div>
+    <div class="card"><div class="card-title">Active Keys</div><div class="stat-value" id="kpi-keys">—</div><div class="stat-label">API keys issued</div></div>
+    <div class="card"><div class="card-title">Avg Latency</div><div class="stat-value" id="kpi-latency">—</div><div class="stat-label">ms per inference</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">API Keys <button class="new-key-btn" onclick="createKey()">+ new key</button></div>
+      <table><thead><tr><th>Customer</th><th>Tier</th><th>GU Used</th><th>Last Used</th></tr></thead>
+      <tbody id="keys-body"><tr><td colspan="4" class="loading">loading…</td></tr></tbody></table>
+    </div>
+    <div class="card"><div class="card-title">Platform Usage</div><div id="platform-usage" class="loading">loading…</div></div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card"><div class="card-title">Governance Calendar — Daily Activity</div><div id="calendar-body" class="loading">loading…</div></div>
+    <div class="card"><div class="card-title">Language Distribution</div><div id="lang-body" class="loading">loading…</div></div>
+    <div class="card"><div class="card-title">System Health <button class="info-btn" onclick="openPanel()" title="How to read System Health">ⓘ</button></div><div id="health-body" class="loading">loading…</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Audit Log — Inference Records <span style="color:var(--text3);font-weight:400;font-size:10px">Cryptographically signed · Immutable · Verifiable</span></div>
+    <table>
+      <thead><tr><th>Timestamp</th><th>Lang</th><th>Tokens In</th><th>Tokens Out</th><th>Joules</th><th>Latency</th><th>Path</th><th>Status</th><th>Catalogue ID</th></tr></thead>
+      <tbody id="audit-body"><tr><td colspan="8" class="loading">loading…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+
+<div class="info-panel" id="info-panel">
+  <div class="panel-header">
+    <div class="panel-title">How to Read System Health</div>
+    <button class="panel-close" onclick="closePanel()">✕ close</button>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">What Each Module Does</div>
+    <div class="module-row"><div class="module-name">auth</div><div class="module-desc">API key validation. Confirms that every inference request carries a valid, authorized key before processing begins.</div></div>
+    <div class="module-row"><div class="module-name">gate</div><div class="module-desc">Language governance matrix. Loaded with 23 supported languages — enforces domain classification and language routing before inference.</div></div>
+    <div class="module-row"><div class="module-name">metering</div><div class="module-desc">Governance unit tracking. Records every inference for billing, accountability, and compliance reporting in real time.</div></div>
+    <div class="module-row"><div class="module-name">nerp</div><div class="module-desc">Token budget enforcement. Sets and enforces energy-aware token ceilings per inference — prevents runaway AI output.</div></div>
+    <div class="module-row"><div class="module-name">ttp</div><div class="module-desc">Energy telemetry monitor. Measures computational energy (joules) consumed per inference using the reference environment power sampler.</div></div>
+    <div class="module-row"><div class="module-name">output_gateway</div><div class="module-desc">Cryptographic signing engine. Every governed inference output is signed with an Ed25519 key and assigned an immutable catalogue ID.</div></div>
+    <div class="module-row"><div class="module-name">zitg</div><div class="module-desc">Zero-Inference Trust Governance. Verifies model integrity at startup. Requires local Ollama on the reference environment — shows degraded on cloud deployment.</div></div>
+    <div class="module-row"><div class="module-name">ollama</div><div class="module-desc">Local LLM engine. Used for local governed inference on the reference iMac. Shows unreachable on cloud deployments — inference routes to Anthropic instead.</div></div>
+    <div class="module-row"><div class="module-name">catalogue entries</div><div class="module-desc">Total cryptographically signed inference records stored in the immutable output catalogue since deployment.</div></div>
+    <div class="module-row"><div class="module-name">active keys</div><div class="module-desc">Number of API keys currently authorized to submit governed inferences to the pipeline.</div></div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">Status Meanings</div>
+    <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><strong style="font-family:var(--mono);font-size:11px">ok</strong> — Module fully operational. No action required.</div>
+    <div class="legend-row"><div class="legend-dot" style="background:var(--amber)"></div><strong style="font-family:var(--mono);font-size:11px">degraded</strong> — Running in fallback mode. Core governance still active but one component is unavailable. Expected on cloud deployments.</div>
+    <div class="legend-row"><div class="legend-dot" style="background:var(--red)"></div><strong style="font-family:var(--mono);font-size:11px">unreachable</strong> — Component is offline. For cloud deployments, ollama unreachable is expected and normal — inference routes to Anthropic.</div>
+    <div class="legend-row"><div class="legend-dot" style="background:var(--text3)"></div><strong style="font-family:var(--mono);font-size:11px">mock</strong> — Running in test mode. Real inference is disabled. Not used in production.</div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">About This System</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.8">
+      The IGM pipeline runs on a three-tier architecture: <strong>inference governance</strong> (GATE + NERP + ZITG), <strong>energy accountability</strong> (TTP), and <strong>cryptographic provenance</strong> (OutputGateway). Every governed inference passes through all active modules before a response is released.<br><br>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text3)">USPTO Provisional 19/571,156 · DeBacco Nexus LLC · debacconexus.ai</span>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  IGM — Inference Governance Module &nbsp;·&nbsp; DeBacco Nexus LLC &nbsp;·&nbsp; USPTO Provisional 19/571,156 &nbsp;·&nbsp; Reference environment: Intel iMac20,1
+  <br><span style="color:var(--amber);margin-top:6px;display:inline-block">⚠ Energy (joules) measured on Intel iMac20,1 reference environment via powermetrics · Token counts are real inference data · Water and CO₂ are not reported — pipeline does not measure these values</span>
+</div>
+
+<script>
+  const BASE_URL  = "https://igm-pipeline-production.up.railway.app";
+  const ADMIN_KEY = "igm-admin-2026-nexus";
+  const REFRESH_MS = 30000;
+  const LANG_NAMES = {en:"English",es:"Spanish",tl:"Tagalog",zh:"Chinese",vi:"Vietnamese",ko:"Korean",hy:"Armenian",fa:"Farsi",ar:"Arabic",ru:"Russian",fr:"French",de:"German",ja:"Japanese",hi:"Hindi",pt:"Portuguese"};
+  const hdrs = () => ({"Content-Type":"application/json","X-Admin-Key":ADMIN_KEY});
+
+  async function apiFetch(path) {
+    const r = await fetch(BASE_URL + path, {headers:hdrs()});
+    if (!r.ok) throw new Error(`${path} -> ${r.status}`);
+    return r.json();
+  }
+  function showError(msg) {
+    const el = document.getElementById("error-banner");
+    el.textContent = "⚠ " + msg; el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 8000);
+  }
+  function fmtTime(ts) { if (!ts) return "—"; return new Date(ts*1000).toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+  function fmtDate(str) { if (!str) return "—"; return new Date(str+"T00:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}); }
+
+  async function loadSummary() {
+    const data = await apiFetch("/v1/admin/summary");
+    const usage = data.platform_usage || {};
+    document.getElementById("kpi-revenue").textContent = "$"+(data.estimated_revenue||0).toFixed(2);
+    document.getElementById("kpi-gu").textContent = usage.total_gu??"0";
+    document.getElementById("kpi-keys").textContent = data.active_keys??"0";
+    const keys = data.keys||[];
+    document.getElementById("keys-body").innerHTML = keys.length
+      ? keys.map(k=>`<tr><td><strong>${k.customer_name||"—"}</strong></td><td><span class="badge badge-${k.tier==='pro'?'pro':'free'}">${k.tier||"free"}</span></td><td class="mono">${k.gu_used??0}</td><td class="mono">${k.last_used_at?fmtTime(k.last_used_at):"—"}</td></tr>`).join("")
+      : `<tr><td colspan="4" class="loading">No keys found</td></tr>`;
+    document.getElementById("platform-usage").innerHTML = `<div class="usage-grid">
+      <div class="usage-item"><div class="usage-label">Total inferences</div><div class="usage-value">${usage.total_inferences??0}</div></div>
+      <div class="usage-item"><div class="usage-label">Total tokens</div><div class="usage-value">${(usage.total_tokens??0).toLocaleString()}</div></div>
+      <div class="usage-item"><div class="usage-label">Total joules</div><div class="usage-value">${(usage.total_joules??0).toFixed(2)} J</div></div>
+      <div class="usage-item"><div class="usage-label">Avg latency</div><div class="usage-value">${usage.avg_latency_ms?Math.round(usage.avg_latency_ms).toLocaleString()+"ms":"—"}</div></div>
+      <div class="usage-item" style="grid-column:1/-1"><div class="usage-label">Active keys</div><div class="usage-value">${usage.active_keys??0}</div></div>
+    </div>`;
+    const langArr = usage.top_languages||[];
+    const maxL = langArr[0]?.count||1;
+    document.getElementById("lang-body").innerHTML = langArr.length
+      ? langArr.map(({lang_code:code,count})=>`<div class="lang-item"><div class="lang-row"><span><span class="lang-code">${code}</span> &nbsp;<span class="lang-name">${LANG_NAMES[code]||code}</span></span><span class="lang-count">${count}</span></div><div class="lang-bar-bg"><div class="lang-bar" style="width:${Math.round(count/maxL*100)}%"></div></div></div>`).join("")
+      : '<div class="loading">No data</div>';
+  }
+
+  async function loadHealth() {
+    const data = await apiFetch("/v1/health");
+    const mods = data.modules||{};
+    const entries = [...Object.entries(mods),["catalogue entries",data.catalogue_entries],["active keys",data.active_keys]];
+    document.getElementById("health-body").innerHTML = `<div class="health-grid">`+
+      entries.map(([name,val])=>{
+        const s=String(val||"");
+        const cls=s.startsWith("ok")?"health-ok":s==="mock"?"health-warn":"health-err";
+        return `<div class="health-item"><span class="health-name">${name}</span><span class="${cls}">${val??'—'}</span></div>`;
+      }).join("")+`</div>`;
+  }
+
+  async function loadCalendar() {
+    const data = await apiFetch("/v1/admin/calendar?days=7");
+    const days = data.calendar||[];
+    document.getElementById("calendar-body").innerHTML = days.length
+      ? days.slice(0,7).map(d=>`<div class="cal-day"><div class="cal-date">${fmtDate(d.day)}</div><div class="cal-stats"><div class="cal-stat"><strong>${d.gu??0}</strong> GU</div><div class="cal-stat"><strong>${d.inferences??0}</strong> inferences</div><div class="cal-stat"><strong>${d.tokens??0}</strong> tokens</div><div class="cal-stat"><strong>${(d.joules??0).toFixed(1)} J</strong></div></div></div>`).join("")
+      : '<div class="loading">No data</div>';
+  }
+
+  async function loadAudit() {
+    const data = await apiFetch("/v1/admin/audit?n=20");
+    const entries = data.entries||[];
+    const lats = entries.map(e=>e.pipeline_ms||e.latency_ms||0).filter(Boolean);
+    const avg = lats.length?Math.round(lats.reduce((a,b)=>a+b,0)/lats.length):0;
+    document.getElementById("kpi-latency").textContent = avg?avg.toLocaleString()+"ms":"—";
+    document.getElementById("audit-body").innerHTML = entries.length
+      ? entries.map(e=>{
+          const st=e.governance_status||e.status||"PASS";
+          const path=e.path||"governed";
+          const pathBadge=path==="governed"
+            ? `<span class="badge badge-pass">GOVERNED</span>`
+            : `<span class="badge badge-fail">UNGOVERNED</span>`;
+          const statusBadge=st==="PASS"
+            ? `<span class="badge badge-pass">PASS</span>`
+            : st==="NONE"
+            ? `<span class="badge badge-fail">NO GOVERNANCE</span>`
+            : `<span class="badge badge-fail">${st}</span>`;
+          return `<tr><td class="mono">${fmtTime(e.timestamp)}</td><td class="mono">${e.lang_code||"en"}</td><td class="mono">${e.tokens_in??"—"}</td><td class="mono">${e.tokens_out??"—"}</td><td class="mono">${e.joules!=null?e.joules.toFixed(1)+"J":"—"}</td><td class="mono">${e.latency_ms!=null?Math.round(e.latency_ms).toLocaleString()+"ms":"—"}</td><td>${pathBadge}</td><td>${statusBadge}</td><td class="mono" style="color:var(--text3);font-size:11px">${(e.catalogue_entry_id||e.entry_id||"—").slice(0,16)}</td></tr>`;
+        }).join("")
+      : `<tr><td colspan="9" class="loading">No audit records</td></tr>`;
+  }
+
+  async function loadAll() {
+    document.getElementById("status-text").textContent="syncing…";
+    try { await Promise.all([loadSummary(),loadHealth(),loadCalendar(),loadAudit()]); document.getElementById("status-text").textContent="live"; }
+    catch(err) { document.getElementById("status-text").textContent="error"; showError("Pipeline connection error: "+err.message); }
+  }
+
+  async function createKey() {
+    const name=prompt("Customer name:"); if(!name) return;
+    const tier=prompt("Tier (free / pro):","free");
+    try {
+      const r=await fetch(BASE_URL+"/v1/admin/keys",{method:"POST",headers:hdrs(),body:JSON.stringify({customer_name:name,tier:tier||"free"})});
+      const d=await r.json();
+      alert(`Key created!\n\nAPI Key: ${d.api_key}\n\nStore this now — not shown again.`);
+      loadSummary();
+    } catch(err){showError("Key creation failed: "+err.message);}
+  }
+
+  function openPanel() {
+    document.getElementById("info-panel").classList.add("open");
+    document.getElementById("panel-overlay").classList.add("open");
+  }
+  function closePanel() {
+    document.getElementById("info-panel").classList.remove("open");
+    document.getElementById("panel-overlay").classList.remove("open");
+  }
+
+  document.getElementById("current-date").textContent = new Date().toLocaleDateString("en-US",{month:"long",year:"numeric"});
+  let countdown=REFRESH_MS/1000;
+  setInterval(()=>{countdown--;if(countdown<=0){countdown=REFRESH_MS/1000;loadAll();}document.getElementById("countdown").textContent=`auto-refresh in ${countdown}s`;},1000);
+  loadAll();
+</script>
+</body>
+</html>

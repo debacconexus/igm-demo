@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inference Governance Module — Live Demo · DeBacco Nexus LLC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0a0e14;
+    --bg2:       #0f1520;
+    --bg3:       #151d2e;
+    --border:    #1e2d45;
+    --border2:   #253550;
+    --text:      #e2e8f4;
+    --text2:     #8899bb;
+    --text3:     #4a5e80;
+    --green:     #00e5a0;
+    --green-dim: #00b87d;
+    --green-bg:  rgba(0,229,160,0.06);
+    --red:       #ff4d6a;
+    --red-dim:   #cc2d47;
+    --red-bg:    rgba(255,77,106,0.06);
+    --blue:      #4d9fff;
+    --blue-bg:   rgba(77,159,255,0.08);
+    --amber:     #ffb347;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'IBM Plex Sans', sans-serif;
+    --radius:    10px;
+    --radius-lg: 14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+
+  /* ── Layout ── */
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 60px}
+
+  /* ── Header ── */
+  .header-meta{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.04em;margin-bottom:10px}
+  .header-title{font-size:28px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin-bottom:4px}
+  .header-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+
+  /* ── View tabs ── */
+  .view-tabs{display:flex;gap:6px;margin-bottom:24px}
+  .view-btn{background:transparent;border:0.5px solid var(--border2);border-radius:var(--radius);
+    padding:7px 16px;font-size:12px;cursor:pointer;color:var(--text2);font-family:var(--sans);
+    transition:all .15s;letter-spacing:.02em}
+  .view-btn:hover{border-color:var(--blue);color:var(--text)}
+  .view-btn.on{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+
+  /* ── Scenario tabs ── */
+  .scenario-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .sc-btn{background:transparent;border:0.5px solid var(--border);border-radius:8px;
+    padding:5px 11px;font-size:11px;cursor:pointer;color:var(--text3);font-family:var(--mono);
+    transition:all .15s;white-space:nowrap;letter-spacing:.01em}
+  .sc-btn:hover{border-color:var(--border2);color:var(--text2)}
+  .sc-btn.on{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+  .sc-btn.custom.on{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+
+  /* ── Domain badge ── */
+  .domain-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .domain-badge{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px;
+    border:0.5px solid var(--green);color:var(--green);background:var(--green-bg);font-weight:600;letter-spacing:.04em}
+  .domain-badge.cyber{border-color:#c084fc;color:#c084fc;background:rgba(192,132,252,.08)}
+  .domain-badge.cloud{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.08)}
+  .domain-badge.robo{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+  .domain-badge.nano{border-color:#a78bfa;color:#a78bfa;background:rgba(167,139,250,.08)}
+  .domain-badge.tni{border-color:var(--amber);color:var(--amber);background:rgba(255,179,71,.08)}
+  .domain-badge.equity{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+  .domain-badge.custom{border-color:var(--text2);color:var(--text2);background:rgba(136,153,187,.06)}
+  .domain-meta{font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+  /* ── Gap banner ── */
+  .gap-banner{background:var(--blue-bg);border-left:2px solid var(--blue);
+    padding:12px 16px;border-radius:0 var(--radius) var(--radius) 0;margin-bottom:14px}
+  .gap-title{font-family:var(--mono);font-size:10px;color:var(--blue);margin-bottom:4px;letter-spacing:.03em}
+  .gap-desc{font-size:13px;color:var(--text2);line-height:1.55}
+
+  /* ── Prompt box ── */
+  .prompt-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:.03em}
+  .prompt-box{font-size:13px;background:var(--bg3);border-radius:var(--radius);
+    padding:12px 16px;line-height:1.65;color:var(--text2);font-style:italic;
+    border:0.5px solid var(--border);margin-bottom:14px}
+
+  /* ── Custom textarea ── */
+  .custom-wrap{background:var(--bg3);border:0.5px solid var(--border2);
+    border-radius:var(--radius-lg);padding:16px;margin-bottom:14px}
+  .custom-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:8px;letter-spacing:.03em}
+  .custom-input{width:100%;min-height:90px;padding:10px 12px;font-size:13px;
+    font-family:var(--sans);line-height:1.6;background:var(--bg2);
+    border:0.5px solid var(--border2);border-radius:8px;color:var(--text);
+    resize:vertical;outline:none;transition:border-color .15s}
+  .custom-input:focus{border-color:var(--blue)}
+  .custom-input::placeholder{color:var(--text3)}
+  .custom-hint{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:6px}
+
+  /* ── Split panels ── */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  @media(max-width:600px){.split{grid-template-columns:1fr}}
+  .panel{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+  .panel-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .panel-title{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em}
+  .panel-ceiling{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto}
+  .log-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px;letter-spacing:.02em}
+  .log-area{min-height:115px;margin-bottom:12px}
+  .log-row{display:flex;gap:8px;padding:3px 0;font-family:var(--mono);font-size:11px;
+    line-height:1.5;opacity:0;transform:translateX(-6px);transition:opacity .22s,transform .22s}
+  .log-row.vis{opacity:1;transform:none}
+  .log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+  .log-empty{font-family:var(--mono);font-size:11px;color:var(--text3);font-style:italic;
+    display:flex;align-items:center;min-height:115px}
+  .divider{border:none;border-top:0.5px solid var(--border);margin-bottom:10px}
+  .resp-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:5px;letter-spacing:.02em}
+  .resp-text{font-size:12px;line-height:1.7;white-space:pre-wrap;min-height:60px;color:var(--text)}
+  .resp-pending{color:var(--text3);font-style:italic}
+  .resp-tokens{font-family:var(--mono);font-size:10px;margin-top:6px}
+
+  /* ── Run button ── */
+  .run-btn{width:100%;padding:12px;font-size:13px;font-weight:600;cursor:pointer;
+    background:transparent;border:0.5px solid var(--green);border-radius:var(--radius);
+    color:var(--green);font-family:var(--sans);letter-spacing:.02em;
+    transition:all .15s;margin-bottom:12px}
+  .run-btn:hover:not(:disabled){background:var(--green-bg)}
+  .run-btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* ── Error box ── */
+  .err-box{font-family:var(--mono);font-size:11px;color:var(--red);background:var(--red-bg);
+    border:0.5px solid var(--red-dim);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px}
+
+  /* ── Differential callout ── */
+  .diff-box{border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;border:0.5px solid var(--border)}
+  .diff-box.saved{background:var(--green-bg);border-color:var(--green-dim)}
+  .diff-val{font-family:var(--mono);font-size:22px;font-weight:700}
+  .diff-divider{width:0.5px;height:36px;background:var(--border2);flex-shrink:0}
+  .diff-col{min-width:60px}
+  .diff-col-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:2px}
+  .diff-col-val{font-family:var(--mono);font-size:15px;font-weight:600}
+  .diff-pct{margin-left:auto;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--green)}
+
+  /* ── Metrics ── */
+  .metrics-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+  .metrics-sub{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:10px;letter-spacing:.02em}
+  .metrics-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px}
+  @media(max-width:600px){.metrics-grid{grid-template-columns:repeat(3,1fr)}}
+  .metric{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+  .metric-label{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:3px}
+  .metric-val{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--text)}
+  .metrics-note{font-family:var(--mono);font-size:10px;color:var(--text3)}
+
+  /* ── Architecture ── */
+  .arch-note{font-family:var(--mono);font-size:10px;color:var(--text3);padding:10px 14px;
+    background:var(--bg3);border-radius:var(--radius);margin-top:12px;
+    border:0.5px solid var(--border);line-height:1.6}
+
+  /* ── Scanline overlay ── */
+  body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+    pointer-events:none;z-index:9999}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header-meta">USPTO 19/571,156 &middot; Patent pending &middot; DeBacco Nexus LLC &middot; info@debacconexus.com</div>
+  <div class="header-title">Inference Governance Module</div>
+  <div class="header-sub">Live demo &middot; Governed vs. ungoverned inference &middot; Thermodynamics &middot; Robotics &middot; Nanotech &middot; Cloud Security &middot; Access Equity</div>
+
+  <!-- View tabs -->
+  <div class="view-tabs">
+    <button class="view-btn on" id="bDemo" onclick="setView('demo')">Live demo</button>
+    <button class="view-btn" id="bArch" onclick="setView('arch')">Architecture</button>
+  </div>
+
+  <!-- DEMO VIEW -->
+  <div id="vDemo">
+    <!-- Scenario tabs -->
+    <div class="scenario-tabs" id="scTabs"></div>
+
+    <!-- Domain badge row -->
+    <div class="domain-row">
+      <span class="domain-badge" id="domBadge"></span>
+      <span class="domain-meta" id="domMeta"></span>
+    </div>
+
+    <!-- Gap banner (pre-built) -->
+    <div class="gap-banner" id="gapBanner">
+      <div class="gap-title" id="gapTitle"></div>
+      <div class="gap-desc"  id="gapDesc"></div>
+    </div>
+
+    <!-- Custom textarea -->
+    <div class="custom-wrap" id="customWrap" style="display:none">
+      <div class="custom-label">Enter your real-world situation — IGM will govern vs. ungoverned inference on your exact query</div>
+      <textarea class="custom-input" id="customInput"
+        placeholder="Describe your situation. Example: I run a healthcare AI company processing 15,000 patient queries per day averaging 780 tokens each at $18 per million tokens. We have no token governance. What are our annual inference costs and what would IGM save us?"></textarea>
+      <div class="custom-hint">IGM auto-classifies your domain &middot; enforces 150-token structured ceiling &middot; compares against ungoverned (400-token) response — live.</div>
+    </div>
+
+    <!-- Prompt display (pre-built) -->
+    <div id="promptWrap">
+      <div class="prompt-label">Real-world situation &mdash; identical prompt sent to both paths simultaneously</div>
+      <div class="prompt-box" id="promptBox"></div>
+    </div>
+
+    <!-- Split panels -->
+    <div class="split">
+      <!-- Governed -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="dot" style="background:var(--green)"></div>
+          <span class="panel-title" style="color:var(--green)">IGM governed</span>
+          <span class="panel-ceiling" id="govCeil"></span>
+        </div>
+        <div class="log-label">Governance decision log</div>
+        <div class="log-area" id="govLog"></div>
+        <hr class="divider"/>
+        <div class="resp-label">Response</div>
+        <div class="resp-text" id="govResp"></div>
+        <div class="resp-tokens" id="govTok" style="color:var(--green)"></div>
+      </div>
+      <!-- Ungoverned -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="dot" style="background:var(--red)"></div>
+          <span class="panel-title" style="color:var(--red)">Ungoverned</span>
+          <span class="panel-ceiling" id="ungCeil"></span>
+        </div>
+        <div class="log-label">Governance decision log</div>
+        <div class="log-empty">No governance layer active &mdash; direct LLM access, no constraints enforced</div>
+        <hr class="divider"/>
+        <div class="resp-label">Response</div>
+        <div class="resp-text" id="ungResp"></div>
+        <div class="resp-tokens" id="ungTok" style="color:var(--red)"></div>
+      </div>
+    </div>
+
+    <!-- Run button -->
+    <button class="run-btn" id="runBtn" onclick="run()">Run this scenario</button>
+
+    <!-- Error -->
+    <div class="err-box" id="errBox" style="display:none"></div>
+
+    <!-- Differential -->
+    <div id="diffBox" style="display:none" class="diff-box">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:3px">Token differential — this run</div>
+        <div class="diff-val" id="diffVal"></div>
+      </div>
+      <div class="diff-divider"></div>
+      <div class="diff-col">
+        <div class="diff-col-label">Governed</div>
+        <div class="diff-col-val" id="diffGov" style="color:var(--green)"></div>
+      </div>
+      <div class="diff-col">
+        <div class="diff-col-label">Ungoverned</div>
+        <div class="diff-col-val" id="diffUng" style="color:var(--red)"></div>
+      </div>
+      <div class="diff-pct" id="diffPct"></div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-title">Cumulative resource savings &mdash; this session</div>
+    <div class="metrics-sub">Real token differential &times; constants: 0.3&thinsp;mWh &middot; 0.5&thinsp;mL H&#x2082;O &middot; 0.15&thinsp;mg CO&#x2082; &middot; $0.003/1K tokens</div>
+    <div class="metrics-grid">
+      <div class="metric"><div class="metric-label">Tokens saved</div><div class="metric-val" id="mT">0</div></div>
+      <div class="metric"><div class="metric-label">Energy (mWh)</div><div class="metric-val" id="mE">0.00</div></div>
+      <div class="metric"><div class="metric-label">Water (mL)</div><div class="metric-val" id="mW">0.0</div></div>
+      <div class="metric"><div class="metric-label">CO&#x2082; (mg)</div><div class="metric-val" id="mC">0.00</div></div>
+      <div class="metric"><div class="metric-label">Cost saved ($)</div><div class="metric-val" id="mK">0.0000</div></div>
+    </div>
+    <div class="metrics-note">Run all 9 scenarios &mdash; including your own &mdash; to see full cumulative environmental and capital impact.</div>
+  </div>
+
+  <!-- ARCH VIEW -->
+  <div id="vArch" style="display:none">
+    <svg width="100%" viewBox="0 0 700 520" role="img">
+      <title>IGM inference boundary architecture</title>
+      <desc>Left governed path: user request flows through IGM — input validation, PII scanner, token ceiling enforcer, output classifier — then authorized to LLM producing a precise governed response. Right ungoverned path: request bypasses all governance going directly to LLM.</desc>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <!-- Divider -->
+      <line x1="350" y1="20" x2="350" y2="480" stroke="#1e2d45" stroke-width="1" stroke-dasharray="5 5"/>
+      <!-- Col headers -->
+      <text font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#e2e8f4" x="165" y="32" text-anchor="middle">Governed path</text>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#00e5a0" x="165" y="48" text-anchor="middle">IGM active</text>
+      <text font-family="IBM Plex Sans" font-size="14" font-weight="600" fill="#e2e8f4" x="535" y="32" text-anchor="middle">Ungoverned path</text>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#ff4d6a" x="535" y="48" text-anchor="middle">Direct LLM access</text>
+      <!-- Left: user request -->
+      <rect x="65" y="60" width="200" height="44" rx="8" fill="#0f1520" stroke="#253550" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#8899bb" x="165" y="82" text-anchor="middle" dominant-baseline="central">User request</text>
+      <line x1="165" y1="104" x2="165" y2="120" stroke="#253550" stroke-width="1" marker-end="url(#ah)"/>
+      <!-- IGM box -->
+      <rect x="65" y="122" width="200" height="188" rx="10" fill="rgba(0,229,160,0.04)" stroke="#00b87d" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="14" font-weight="700" fill="#00e5a0" x="165" y="142" text-anchor="middle" dominant-baseline="central">IGM</text>
+      <text font-family="IBM Plex Mono" font-size="10" fill="#00b87d" x="165" y="158" text-anchor="middle" dominant-baseline="central">Inference governance module</text>
+      <!-- Inner nodes -->
+      <rect x="83" y="168" width="164" height="26" rx="5" fill="#0f1520" stroke="#1e2d45" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#8899bb" x="165" y="181" text-anchor="middle" dominant-baseline="central">Input validation</text>
+      <rect x="83" y="200" width="164" height="26" rx="5" fill="#0f1520" stroke="#1e2d45" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#8899bb" x="165" y="213" text-anchor="middle" dominant-baseline="central">PII scanner</text>
+      <rect x="83" y="232" width="164" height="26" rx="5" fill="#0f1520" stroke="#1e2d45" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#8899bb" x="165" y="245" text-anchor="middle" dominant-baseline="central">Token ceiling enforcer</text>
+      <rect x="83" y="264" width="164" height="26" rx="5" fill="#0f1520" stroke="#1e2d45" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#8899bb" x="165" y="277" text-anchor="middle" dominant-baseline="central">Output classifier</text>
+      <!-- Auth arrow -->
+      <line x1="165" y1="310" x2="165" y2="328" stroke="#00e5a0" stroke-width="1" marker-end="url(#ah)"/>
+      <text font-family="IBM Plex Mono" font-size="10" fill="#00e5a0" x="178" y="320" dominant-baseline="central">Authorized</text>
+      <!-- Left: LLM -->
+      <rect x="65" y="330" width="200" height="44" rx="8" fill="rgba(77,159,255,0.06)" stroke="#253550" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#4d9fff" x="165" y="352" text-anchor="middle" dominant-baseline="central">Large language model</text>
+      <line x1="165" y1="374" x2="165" y2="388" stroke="#253550" stroke-width="1" marker-end="url(#ah)"/>
+      <!-- Left: governed response -->
+      <rect x="65" y="390" width="200" height="52" rx="8" fill="rgba(0,229,160,0.06)" stroke="#00b87d" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="700" fill="#00e5a0" x="165" y="409" text-anchor="middle" dominant-baseline="central">Governed response</text>
+      <text font-family="IBM Plex Mono" font-size="10" fill="#00b87d" x="165" y="426" text-anchor="middle" dominant-baseline="central">Precise &middot; bounded &middot; auditable</text>
+      <!-- Right: user request -->
+      <rect x="435" y="60" width="200" height="44" rx="8" fill="#0f1520" stroke="#253550" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#8899bb" x="535" y="82" text-anchor="middle" dominant-baseline="central">User request</text>
+      <!-- Bypass arrow -->
+      <line x1="535" y1="104" x2="535" y2="328" stroke="#cc2d47" stroke-width="1" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+      <text font-family="IBM Plex Mono" font-size="10" fill="#ff4d6a" x="548" y="210" dominant-baseline="central">No governance layer</text>
+      <!-- Right: LLM -->
+      <rect x="435" y="330" width="200" height="44" rx="8" fill="rgba(77,159,255,0.06)" stroke="#253550" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="500" fill="#4d9fff" x="535" y="352" text-anchor="middle" dominant-baseline="central">Large language model</text>
+      <line x1="535" y1="374" x2="535" y2="388" stroke="#253550" stroke-width="1" marker-end="url(#ah)"/>
+      <!-- Right: ungoverned response -->
+      <rect x="435" y="390" width="200" height="52" rx="8" fill="rgba(255,77,106,0.06)" stroke="#cc2d47" stroke-width="0.5"/>
+      <text font-family="IBM Plex Sans" font-size="13" font-weight="700" fill="#ff4d6a" x="535" y="409" text-anchor="middle" dominant-baseline="central">Ungoverned response</text>
+      <text font-family="IBM Plex Mono" font-size="10" fill="#cc2d47" x="535" y="426" text-anchor="middle" dominant-baseline="central">Verbose &middot; unstructured &middot; at risk</text>
+      <!-- Legend -->
+      <rect x="67" y="460" width="10" height="10" rx="2" fill="rgba(0,229,160,0.1)" stroke="#00b87d" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#4a5e80" x="83" y="467" dominant-baseline="central">Governance layer</text>
+      <rect x="237" y="460" width="10" height="10" rx="2" fill="rgba(77,159,255,0.1)" stroke="#253550" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#4a5e80" x="253" y="467" dominant-baseline="central">Language model</text>
+      <rect x="390" y="460" width="10" height="10" rx="2" fill="rgba(255,77,106,0.1)" stroke="#cc2d47" stroke-width="0.5"/>
+      <text font-family="IBM Plex Mono" font-size="11" fill="#4a5e80" x="406" y="467" dominant-baseline="central">Uncontrolled inference</text>
+    </svg>
+    <div class="arch-note">
+      Conceptual boundary only. Full architecture protected under USPTO&nbsp;19/571,156 (patent pending) &middot; DeBacco Nexus LLC &middot; info@debacconexus.com
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+// ── API KEY ──────────────────────────────────────────────────────────────────
+// Replace the value below with your Anthropic API key before distributing.
+var API_KEY = "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";
+
+// ── SCENARIOS ────────────────────────────────────────────────────────────────
+var SC = [
+  {num:"01",title:"Thermal safety",domain:"Thermodynamics",domClass:"",
+   gT:"Thermodynamics · Safety gap — thermal engineer at critical threshold",
+   gD:"A thermal safety engineer at a PWR reactor finds the primary coolant loop 8°C from critical failure. Ungoverned AI produces 900 words of background. IGM delivers exact safety parameters — immediately.",
+   p:"I am a thermal safety engineer. My PWR primary coolant loop reads 284°C at 6.8 MPa. Critical boiling threshold is 292°C. I have a 4-hour window before mandatory shutdown review. What are my immediate actions and acceptable operating bounds?",
+   gs:"You are a governed nuclear thermal safety AI. Respond ONLY in this exact structure, no other text: CURRENT STATUS: [one sentence] | SAFETY MARGIN: [value with units] | IMMEDIATE ACTIONS: 1.[action] 2.[action] 3.[action] | SHUTDOWN THRESHOLD: [temperature] | ESCALATE TO: [role]",
+   gm:120,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Safety query — critical domain authorized"},{t:"set",l:"Domain class",d:"NUCLEAR_THERMAL_SAFETY assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"flag",l:"Risk assessment",d:"CRITICAL margin detected — 8°C buffer"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"02",title:"Robotics brain",domain:"Robotics",domClass:"robo",
+   gT:"Robotics · Brain integration gap — inference not validated before actuator",
+   gD:"A robotics engineer integrating an LLM into a surgical robot arm. One unvalidated token reaching the motor controller could cause harm. IGM validates the inference boundary before any command reaches a physical actuator.",
+   p:"I am integrating an LLM into a 6-DOF surgical robot arm. The LLM processes sensor data and outputs motor commands. How do I ensure the inference layer never outputs a command exceeding safe torque limits or velocity thresholds when operating near human tissue?",
+   gs:"You are a governed robotics safety AI. Respond ONLY in this exact structure, no other text: RISK CLASS: [CRITICAL/HIGH/MEDIUM] | INFERENCE GATE REQUIREMENT: [one sentence] | HARD LIMITS: 1.[limit+value] 2.[limit+value] 3.[limit+value] | VALIDATION METHOD: [one sentence] | IGM REQUIRED: YES",
+   gm:120,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Robotics safety query — authorized"},{t:"flag",l:"Risk assessment",d:"CRITICAL — actuator-adjacent inference"},{t:"set",l:"Domain class",d:"SURGICAL_ROBOTICS assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"03",title:"Nanotech ROI",domain:"Nanotech",domClass:"nano",
+   gT:"Nanotech · Investment waste — millions burning in ungoverned inference",
+   gD:"A nanotech company runs 40,000 ungoverned inference calls daily for carbon nanotube defect detection — no token limits, no audit trail. IGM calculates the real cost and ROI in one structured response.",
+   p:"I own a nanomaterial manufacturing firm. Our AI QC system runs 40,000 inference calls per day for carbon nanotube defect detection. Each query averages 847 output tokens at $15 per million output tokens. What is my annual AI spend, and what would governed inference at 150 tokens per query save me annually?",
+   gs:"You are a governed financial analysis AI. Respond ONLY in this exact structure, no other text: CURRENT ANNUAL SPEND: [$X] | GOVERNED ANNUAL SPEND: [$X] | ANNUAL SAVINGS: [$X] | TOKEN REDUCTION: [X%] | PAYBACK PERIOD: [estimate] | RECOMMENDATION: [one sentence]",
+   gm:120,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Financial query — authorized"},{t:"pass",l:"PII detection",d:"No identifiers present"},{t:"set",l:"Domain class",d:"NANOTECH_FINANCIAL_ANALYSIS assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 120 tokens"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"04",title:"TNI thermal field",domain:"Thermodynamics + Nanotech",domClass:"tni",
+   gT:"TNI · Thermodynamic nanorobotic field — inference heat exceeding safe boundary",
+   gD:"A researcher running distributed inference on a 200-node nanorobotic array detects dangerous thermal differential. IGM calculates whether either path crosses the 2kW safe operating boundary.",
+   p:"I am running distributed inference on a 200-node nanorobotic array. Thermal sensors show 0.87 joules per governed call and 4.2 joules per ungoverned call. At 10,000 calls per hour, calculate thermal differential, total power load for each path, and whether either crosses a 2kW safe operating boundary.",
+   gs:"You are a governed thermodynamic analysis AI. Respond ONLY in this exact structure, no other text: GOVERNED THERMAL LOAD: [X watts] | UNGOVERNED THERMAL LOAD: [X watts] | DIFFERENTIAL: [X watts / X%] | SAFE BOUNDARY (2kW): [WITHIN or EXCEEDED for each path] | CRITICAL FINDING: [one sentence]",
+   gm:100,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Thermal analysis — authorized"},{t:"set",l:"Domain class",d:"TNI_THERMODYNAMIC assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 100 tokens"},{t:"flag",l:"Risk assessment",d:"Thermal boundary proximity detected"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"05",title:"Robot emergency",domain:"Robotics",domClass:"robo",
+   gT:"Robotics · Emergency — autonomous arm detects human in work envelope",
+   gD:"An autonomous robot arm detects a human at 0.8 meters with closing velocity making collision likely. Ungoverned AI begins a safety lecture. IGM delivers the only answer that matters — in the only timeframe that matters.",
+   p:"EMERGENCY: Autonomous robot arm (Fanuc M-20iD) detected a human entering the work envelope at 0.8 meters. Current arm velocity: 1.2 m/s. Stop distance at this speed: 0.6 meters. Collision is probable. What is the immediate governance decision?",
+   gs:"You are a governed emergency robotics safety AI. Respond ONLY in this exact structure, no other text: DECISION: [FULL STOP / REDUCE SPEED / REDIRECT] | RATIONALE: [one sentence] | EXECUTE WITHIN: [milliseconds] | HUMAN SAFE: [YES / NO] | OVERRIDE REQUIRED: [YES / NO]",
+   gm:80,um:400,
+   log:[{t:"flag",l:"Input validation",d:"EMERGENCY — human proximity detected"},{t:"act",l:"Priority override",d:"LIFE_SAFETY class activated"},{t:"set",l:"Domain class",d:"EMERGENCY_ROBOTICS assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 80 tokens — minimum viable"},{t:"go",l:"Emergency authorized",d:"Governance active — routing to LLM NOW"}]},
+  {num:"06",title:"AWS Bedrock gap",domain:"Cloud Security",domClass:"cloud",
+   gT:"AWS Bedrock · $340K/year in ungoverned inference costs with zero audit trail",
+   gD:"A Fortune 500 CISO discovers their AWS Bedrock security AI runs 8,000 ungoverned queries daily — no token limits, no structured output, no audit trail. Analysts spend 40% of their time parsing verbose AI noise instead of acting on alerts.",
+   p:"I am a CISO at a Fortune 500 company. Our AWS Bedrock security monitoring AI processes 8,000 queries daily averaging 920 output tokens per call at $20 per million tokens. Analysts spend 40% of their time parsing verbose AI responses to find actual alerts. Calculate our annual inference cost, cost under IGM governance at 120 tokens per call, annual savings, and analyst capacity recovered if parsing drops from 40% to 5%.",
+   gs:"You are a governed cybersecurity financial analysis AI. Respond ONLY in this exact structure, no other text: CURRENT ANNUAL INFERENCE COST: [$X] | GOVERNED ANNUAL COST: [$X] | ANNUAL SAVINGS: [$X] | TOKEN REDUCTION: [X%] | ANALYST CAPACITY RECOVERED: [X%] | SECURITY POSTURE: [one sentence] | IGM VERDICT: [one sentence]",
+   gm:150,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Security financial query — authorized"},{t:"flag",l:"Risk assessment",d:"Ungoverned cloud inference — cost exposure identified"},{t:"set",l:"Domain class",d:"CLOUD_SECURITY_ECONOMICS assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"07",title:"Cybersecurity margin",domain:"Cybersecurity Firm",domClass:"cyber",
+   gT:"Cybersecurity firm · Margin collapse — AWS inference costs exceeding product revenue",
+   gD:"A cybersecurity firm sells AI-powered threat detection to 50 enterprise clients at $45K/month each. Their AWS Bedrock bill is $1.8M/month — the product is underwater. IGM governance restructures the unit economics and restores profitability.",
+   p:"I run a cybersecurity firm with 50 enterprise clients paying $45,000/month for AI-powered threat detection. Our AWS Bedrock inference costs are $1.8M/month — 60,000 security queries per day averaging 1,100 output tokens at $20 per million tokens. IGM governance could reduce output to 180 tokens per query. Calculate current monthly revenue, current gross margin, governed monthly inference cost, new gross margin, and annual margin recovery.",
+   gs:"You are a governed unit economics AI. Respond ONLY in this exact structure, no other text: MONTHLY REVENUE: [$X] | CURRENT INFERENCE COST: [$X/month] | CURRENT GROSS MARGIN: [X%] | GOVERNED INFERENCE COST: [$X/month] | NEW GROSS MARGIN: [X%] | ANNUAL MARGIN RECOVERY: [$X] | MARKET IMPACT: [one sentence]",
+   gm:150,um:400,
+   log:[{t:"pass",l:"Input validation",d:"Financial query — authorized"},{t:"flag",l:"Risk assessment",d:"Margin inversion detected — critical exposure"},{t:"set",l:"Domain class",d:"CYBERSECURITY_UNIT_ECONOMICS assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens"},{t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}]},
+  {num:"08",title:"Token ceiling crisis",domain:"Access Equity",domClass:"equity",
+   gT:"Token ceiling crisis — millions locked out of AI monthly because ungoverned inference wasted their budget",
+   gD:"A paid subscriber hits their monthly token limit on day 19. Not because they needed that many tokens — because every ungoverned query returned 800-word essays when they needed 3-sentence answers. IGM governance preserves their budget and keeps them working all month.",
+   p:"I am a small business owner on a paid AI subscription with a 1,000,000 token monthly output limit. I run approximately 200 queries per day. My current average AI response is 680 tokens per query. I hit my monthly ceiling on day 19 and lose access for 11 days. If IGM governance enforced a 90-token ceiling per response, calculate: my current monthly token consumption, consumption under governance, days of access I would recover, and percentage of my month currently lost.",
+   gs:"You are a governed access equity AI. Respond ONLY in this exact structure, no other text: CURRENT MONTHLY CONSUMPTION: [X tokens] | GOVERNED MONTHLY CONSUMPTION: [X tokens] | TOKENS SAVED PER MONTH: [X] | CEILING HIT UNDER GOVERNANCE: [YES/NO] | DAYS OF ACCESS RECOVERED: [X days] | MONTHLY ACCESS LOST TODAY: [X%] | IGM IMPACT: [one sentence on equitable AI access]",
+   gm:150,um:400,
+   log:[{t:"flag",l:"Input validation",d:"Access equity query — high priority"},{t:"flag",l:"Risk assessment",d:"TOKEN_CEILING_CRISIS class detected"},{t:"set",l:"Domain class",d:"ACCESS_EQUITY / BUDGET_GOVERNANCE assigned"},{t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens — preserving budget"},{t:"act",l:"Ceiling protection",d:"IGM budget preservation protocol active"},{t:"go",l:"Inference authorized",d:"Governance active — protecting access rights"}]}
+];
+
+var CUSTOM_LOG = [
+  {t:"pass",l:"Input validation",d:"Custom query received — scanning content"},
+  {t:"pass",l:"PII detection",d:"Checking for sensitive identifiers"},
+  {t:"set",l:"Domain class",d:"AUTO_CLASSIFY — domain detected from query"},
+  {t:"set",l:"Token ceiling",d:"Hard limit: 150 tokens — budget preserved"},
+  {t:"set",l:"Output class",d:"GOVERNED_BRIEF / COST_OPTIMIZED"},
+  {t:"go",l:"Inference authorized",d:"Governance active — routing to LLM"}
+];
+var CUSTOM_GS = "You are a governed AI assistant under the Inference Governance Module (IGM). Respond ONLY in this exact structure, no prose, no preamble: SITUATION: [one sentence] | FINDING: [key fact or answer, one sentence] | SAVINGS / IMPACT: [quantified benefit, one sentence] | RECOMMENDATION: [one actionable sentence] | IGM NOTE: Governed response — token ceiling enforced.";
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+var cur=0, isCustom=false, busy=false;
+var totals={t:0,e:0,w:0,c:0,k:0};
+var govOut=0, ungOut=0;
+
+var DOT_COL={pass:"#22c55e",set:"#4d9fff",flag:"#ffb347",act:"#ff4d6a",go:"#4a5e80"};
+var TXT_COL={pass:"#22c55e",set:"#4d9fff",flag:"#ffb347",act:"#ff4d6a",go:"#8899bb"};
+
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}
+
+// ── BUILD TABS ───────────────────────────────────────────────────────────────
+(function(){
+  var tabs=document.getElementById("scTabs");
+  SC.forEach(function(sc,i){
+    var b=document.createElement("button");
+    b.className="sc-btn"+(i===0?" on":"");
+    b.textContent=sc.num+" · "+sc.title;
+    b.onclick=function(){pickScene(i);};
+    tabs.appendChild(b);
+  });
+  var c=document.createElement("button");
+  c.className="sc-btn custom";
+  c.id="customTab";
+  c.textContent="09 · Your scenario";
+  c.onclick=pickCustom;
+  tabs.appendChild(c);
+  pickScene(0);
+})();
+
+function pickScene(i){
+  if(busy) return;
+  cur=i; isCustom=false;
+  var s=SC[i];
+  document.querySelectorAll(".sc-btn").forEach(function(b,j){
+    b.classList.toggle("on",j===i);
+    b.classList.remove("custom");
+  });
+  document.getElementById("customTab").classList.remove("on");
+  // domain badge
+  var badge=document.getElementById("domBadge");
+  badge.textContent=s.domain;
+  badge.className="domain-badge"+(s.domClass?" "+s.domClass:"");
+  document.getElementById("domMeta").textContent="Scenario "+s.num+" of "+SC.length+" · Gov ceiling: "+s.gm+" tokens · Ungov ceiling: "+s.um+" tokens";
+  // banner
+  document.getElementById("gapBanner").style.display="";
+  document.getElementById("gapTitle").textContent=s.gT;
+  document.getElementById("gapDesc").textContent=s.gD;
+  document.getElementById("customWrap").style.display="none";
+  document.getElementById("promptWrap").style.display="";
+  document.getElementById("promptBox").textContent=s.p;
+  // ceilings
+  document.getElementById("govCeil").textContent="ceiling: "+s.gm+" tokens";
+  document.getElementById("ungCeil").textContent="ceiling: "+s.um+" tokens";
+  // clear
+  resetOutputs();
+  document.getElementById("runBtn").textContent="Run scenario "+s.num+" — "+s.title;
+}
+
+function pickCustom(){
+  if(busy) return;
+  isCustom=true;
+  document.querySelectorAll(".sc-btn").forEach(function(b){b.classList.remove("on");});
+  document.getElementById("customTab").classList.add("on");
+  var badge=document.getElementById("domBadge");
+  badge.textContent="Custom";
+  badge.className="domain-badge custom";
+  document.getElementById("domMeta").textContent="Live client query · IGM auto-classifies · Gov ceiling: 150 tokens";
+  document.getElementById("gapBanner").style.display="none";
+  document.getElementById("customWrap").style.display="";
+  document.getElementById("promptWrap").style.display="none";
+  document.getElementById("govCeil").textContent="ceiling: 150 tokens";
+  document.getElementById("ungCeil").textContent="ceiling: 400 tokens";
+  resetOutputs();
+  document.getElementById("runBtn").textContent="Run my scenario through IGM";
+}
+
+function resetOutputs(){
+  document.getElementById("govLog").innerHTML="";
+  document.getElementById("govResp").innerHTML="";
+  document.getElementById("govTok").textContent="";
+  document.getElementById("ungResp").innerHTML="";
+  document.getElementById("ungTok").textContent="";
+  document.getElementById("errBox").style.display="none";
+  document.getElementById("diffBox").style.display="none";
+}
+
+// ── API CALL ─────────────────────────────────────────────────────────────────
+function callAPI(prompt,system,maxT,cb){
+  var body={model:"claude-sonnet-4-20250514",max_tokens:maxT,messages:[{role:"user",content:prompt}]};
+  if(system) body.system=system;
+  fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify(body)
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error){cb(null,d.error.type+": "+d.error.message);return;}
+    cb({text:d.content.map(function(c){return c.text||"";}).join(""),out:d.usage.output_tokens,inp:d.usage.input_tokens},null);
+  }).catch(function(e){cb(null,"Fetch error: "+e.message);});
+}
+
+// ── RUN ──────────────────────────────────────────────────────────────────────
+async function run(){
+  if(busy) return;
+  var prompt, govSys, govMax, ungMax, logData;
+  if(isCustom){
+    prompt=document.getElementById("customInput").value.trim();
+    if(!prompt){showErr("Please enter your situation before running.");return;}
+    govSys=CUSTOM_GS; govMax=150; ungMax=400; logData=CUSTOM_LOG;
+  } else {
+    var s=SC[cur];
+    prompt=s.p; govSys=s.gs; govMax=s.gm; ungMax=s.um; logData=s.log;
+  }
+  busy=true;
+  document.getElementById("errBox").style.display="none";
+  document.getElementById("diffBox").style.display="none";
+  var btn=document.getElementById("runBtn");
+  btn.disabled=true;
+  btn.textContent="Running…";
+  document.getElementById("govResp").innerHTML='<span class="resp-pending">Governed inference in progress…</span>';
+  document.getElementById("ungResp").innerHTML='<span class="resp-pending">Ungoverned inference in progress…</span>';
+  document.getElementById("govTok").textContent="";
+  document.getElementById("ungTok").textContent="";
+  govOut=0; ungOut=0;
+  var govDone=false,ungDone=false;
+
+  // Build log rows
+  var html="";
+  logData.forEach(function(e,i){
+    html+='<div class="log-row" id="lr'+i+'"><div class="log-dot" style="background:'+DOT_COL[e.t]+'"></div><div><span style="color:'+TXT_COL[e.t]+';font-weight:600">'+e.l+'</span><span style="color:var(--text3)"> — '+e.d+'</span></div></div>';
+  });
+  document.getElementById("govLog").innerHTML=html;
+
+  function tryFinish(){
+    if(!govDone||!ungDone) return;
+    if(govOut>0&&ungOut>0){
+      var saved=Math.max(0,ungOut-govOut);
+      totals.t+=saved; totals.e+=saved*0.0003; totals.w+=saved*0.5; totals.c+=saved*0.15; totals.k+=saved*0.000003;
+      document.getElementById("mT").textContent=totals.t.toLocaleString();
+      document.getElementById("mE").textContent=(totals.e*1000).toFixed(2);
+      document.getElementById("mW").textContent=totals.w.toFixed(1);
+      document.getElementById("mC").textContent=totals.c.toFixed(2);
+      document.getElementById("mK").textContent=totals.k.toFixed(4);
+      // diff box
+      var db=document.getElementById("diffBox");
+      db.style.display="flex";
+      if(ungOut>govOut){
+        db.className="diff-box saved";
+        document.getElementById("diffVal").style.color="var(--green)";
+        document.getElementById("diffVal").textContent="−"+(ungOut-govOut).toLocaleString()+" tokens";
+        document.getElementById("diffPct").textContent="IGM reduced output by "+Math.round((1-govOut/ungOut)*100)+"%";
+      } else {
+        db.className="diff-box";
+        document.getElementById("diffVal").style.color="var(--amber)";
+        document.getElementById("diffVal").textContent="+"+(govOut-ungOut).toLocaleString()+" tokens";
+        document.getElementById("diffPct").textContent="";
+      }
+      document.getElementById("diffGov").textContent=govOut;
+      document.getElementById("diffUng").textContent=ungOut;
+    }
+    busy=false;
+    btn.disabled=false;
+    btn.textContent=isCustom?"Run my scenario again":"Run again";
+  }
+
+  // GOVERNED call
+  callAPI(prompt,govSys,govMax,function(r,err){
+    if(err){
+      document.getElementById("govResp").textContent="Error: "+err;
+      showErr(err);
+    } else {
+      document.getElementById("govResp").textContent=r.text;
+      document.getElementById("govTok").textContent="Output: "+r.out+" tokens · Input: "+r.inp+" tokens";
+      govOut=r.out;
+    }
+    govDone=true; tryFinish();
+  });
+
+  // UNGOVERNED call
+  callAPI(prompt,null,ungMax,function(r,err){
+    if(err){
+      document.getElementById("ungResp").textContent="Error: "+err;
+    } else {
+      document.getElementById("ungResp").textContent=r.text;
+      document.getElementById("ungTok").textContent="Output: "+r.out+" tokens · Input: "+r.inp+" tokens";
+      ungOut=r.out;
+    }
+    ungDone=true; tryFinish();
+  });
+
+  // Animate log independently
+  for(var j=0;j<logData.length;j++){
+    await sleep(260);
+    var el=document.getElementById("lr"+j);
+    if(el) el.classList.add("vis");
+  }
+}
+
+function showErr(msg){
+  var e=document.getElementById("errBox");
+  e.textContent="⚠ "+msg;
+  e.style.display="block";
+}
+
+function setView(v){
+  document.getElementById("vDemo").style.display=v==="demo"?"":"none";
+  document.getElementById("vArch").style.display=v==="arch"?"":"none";
+  document.getElementById("bDemo").classList.toggle("on",v==="demo");
+  document.getElementById("bArch").classList.toggle("on",v==="arch");
+}
+</script>
+</body>
+</html>

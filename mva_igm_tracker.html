@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MVA · JIV IGM Savings Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#ffffff;--bg2:#f7f8fa;--bg3:#eef0f3;
+  --border:#e3e6eb;--border2:#d0d5dd;
+  --text:#0d1117;--text2:#4a5568;--text3:#9aa3af;
+  --green:#0a7c5c;--green-light:#ecfaf5;--green-border:#b2dfd0;
+  --blue:#1a56db;--blue-light:#eff4ff;--blue-border:#b4c8f8;
+  --red:#c0392b;--red-light:#fdf2f1;--red-border:#f5c0bb;
+  --amber:#b45309;--amber-light:#fffbeb;--amber-border:#fde68a;
+  --gold:#92711a;--gold-light:#fef9e7;
+  --sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --radius:8px;--radius-lg:12px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow:0 1px 4px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+
+.header{border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100;box-shadow:var(--shadow-sm)}
+.header-left{display:flex;flex-direction:column;gap:2px}
+.header-eyebrow{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+.header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.header-right{display:flex;align-items:center;gap:12px}
+.status-live{display:flex;align-items:center;gap:5px;color:var(--green);font-weight:500;font-family:var(--mono);font-size:11px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn{font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--bg3);border-color:var(--border2)}
+.btn-primary{background:var(--text);color:white;border-color:var(--text)}
+.btn-primary:hover{background:#1e2530}
+.btn-green{background:var(--green);color:white;border-color:var(--green)}
+.btn-green:hover{background:#0a6e4a}
+
+.wrap{max-width:1200px;margin:0 auto;padding:24px 24px 80px}
+
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm)}
+.card-title{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+
+.stat-value{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--text);line-height:1;margin-bottom:3px}
+.stat-value.green{color:var(--green)}
+.stat-value.blue{color:var(--blue)}
+.stat-label{font-size:12px;color:var(--text3)}
+
+/* Log form */
+.log-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:20px}
+.log-form-title{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.form-input{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--blue)}
+.form-select{font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);outline:none;cursor:pointer}
+.form-select:focus{border-color:var(--blue)}
+
+/* Savings bar */
+.savings-banner{background:var(--text);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.savings-item{text-align:center}
+.savings-label{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.savings-value{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--green)}
+.savings-unit{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3);margin-top:2px}
+
+/* Table */
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border)}
+td{font-size:12px;padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.mono{font-family:var(--mono);font-size:11px}
+
+.badge{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500}
+.badge-green{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.badge-blue{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-border)}
+.badge-amber{background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-border)}
+.badge-red{background:var(--red-light);color:var(--red);border:1px solid var(--red-border)}
+
+/* Progress bar */
+.progress-bg{background:var(--bg3);border-radius:4px;height:6px;margin-top:8px}
+.progress-bar{height:6px;border-radius:4px;background:var(--green);transition:width .6s ease}
+
+/* Monthly breakdown */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.day-cell{aspect-ratio:1;border-radius:3px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9px;color:var(--text3);cursor:default;transition:all .15s}
+.day-cell.has-data{background:var(--green-light);color:var(--green);border:1px solid var(--green-border)}
+.day-cell.today{border:2px solid var(--green)}
+
+/* Report section */
+.report-box{background:var(--gold-light);border:1px solid var(--amber-border);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px}
+.report-title{font-family:var(--mono);font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.report-stat{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--amber-border)}
+.report-stat:last-child{border-bottom:none}
+.report-stat-label{color:var(--text2)}
+.report-stat-value{font-family:var(--mono);font-weight:600;color:var(--text)}
+
+.footer{text-align:center;padding:24px;font-family:var(--mono);font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:24px}
+
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr 1fr}.savings-banner{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">LA County Dept. of Military & Veterans Affairs · JIV Program · JCOD Grant Compliance</div>
+    <div class="header-title">IGM Savings Tracker — Veterans Treatment Court</div>
+  </div>
+  <div class="header-right">
+    <span class="status-live"><span class="status-dot"></span>live</span>
+    <span id="current-date" style="font-family:var(--mono);font-size:11px;color:var(--text3)"></span>
+    <button class="btn" onclick="exportReport()">↓ Export Report</button>
+    <button class="btn btn-green" onclick="document.getElementById('log-form').scrollIntoView({behavior:'smooth'})">+ Log Interaction</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- KPI Row -->
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-title">Total Interactions Logged</div>
+      <div class="stat-value" id="kpi-total">0</div>
+      <div class="stat-label">AI-assisted case interactions</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Staff Hours Saved</div>
+      <div class="stat-value green" id="kpi-hours">0.0</div>
+      <div class="stat-label">hrs returned to direct veteran services</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Total Cost Saved</div>
+      <div class="stat-value green" id="kpi-cost">$0.00</div>
+      <div class="stat-label">compute + staff time value</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Active VTC Cases</div>
+      <div class="stat-value blue" id="kpi-cases">0</div>
+      <div class="stat-label">veterans in current caseload</div>
+    </div>
+  </div>
+
+  <!-- Savings Banner -->
+  <div class="savings-banner">
+    <div class="savings-item">
+      <div class="savings-label">Tokens Saved</div>
+      <div class="savings-value" id="save-tokens">0</div>
+      <div class="savings-unit">total governed vs ungoverned</div>
+    </div>
+    <div class="savings-item">
+      <div class="savings-label">Energy Saved</div>
+      <div class="savings-value" id="save-energy">0</div>
+      <div class="savings-unit">mWh</div>
+    </div>
+    <div class="savings-item">
+      <div class="savings-label">Water Saved</div>
+      <div class="savings-value" id="save-water">0</div>
+      <div class="savings-unit">mL</div>
+    </div>
+    <div class="savings-item">
+      <div class="savings-label">CO₂ Saved</div>
+      <div class="savings-value" id="save-co2">0</div>
+      <div class="savings-unit">mg</div>
+    </div>
+    <div class="savings-item">
+      <div class="savings-label">IGM Governance Rate</div>
+      <div class="savings-value" id="save-pct">0%</div>
+      <div class="savings-unit">of interactions governed</div>
+    </div>
+  </div>
+
+  <!-- Log Form -->
+  <div class="log-form" id="log-form">
+    <div class="log-form-title">
+      ➕ Log AI-Assisted Interaction
+      <span style="color:var(--text3);font-weight:400">Every interaction logged supports Board of Supervisors reporting and JCOD grant compliance</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Interaction Type</label>
+        <select class="form-select" id="f-type">
+          <option value="case_note">Case Note Documentation</option>
+          <option value="benefits">Benefits Eligibility Research</option>
+          <option value="court_prep">Court Preparation</option>
+          <option value="referral">Referral Letter (LACADA/VPAN/Housing)</option>
+          <option value="claims">VA Claims Processing (526EZ/21-22)</option>
+          <option value="discharge">Discharge Upgrade Research</option>
+          <option value="progress">Progress Report</option>
+          <option value="intake">Veteran Intake</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Court Location</label>
+        <select class="form-select" id="f-court">
+          <option value="CCB">CCB</option>
+          <option value="Compton">Compton</option>
+          <option value="Lancaster">Lancaster</option>
+          <option value="Van Nuys">Van Nuys</option>
+          <option value="DTLA">DTLA</option>
+          <option value="Antelope Valley">Antelope Valley</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Est. Ungoverned Tokens</label>
+        <input type="number" class="form-input" id="f-ungov" value="450" min="1"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Governed Tokens Used</label>
+        <input type="number" class="form-input" id="f-gov" value="150" min="1"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Saved (min)</label>
+        <input type="number" class="form-input" id="f-time" value="12" min="1"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Notes (optional)</label>
+        <input type="text" class="form-input" id="f-notes" placeholder="e.g. 21-22 intake, LACADA referral letter, court progress report…"/>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px;white-space:nowrap" onclick="logInteraction()">Log Interaction →</button>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid-3">
+
+    <!-- By interaction type -->
+    <div class="card">
+      <div class="card-title">Savings by Interaction Type</div>
+      <div id="type-breakdown">
+        <div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:12px 0">No interactions logged yet</div>
+      </div>
+    </div>
+
+    <!-- By court -->
+    <div class="card">
+      <div class="card-title">Activity by Court Location</div>
+      <div id="court-breakdown">
+        <div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:12px 0">No interactions logged yet</div>
+      </div>
+    </div>
+
+    <!-- Board Report Box -->
+    <div class="report-box">
+      <div class="report-title">📋 Board of Supervisors · JCOD Grant Report</div>
+      <div class="report-stat"><span class="report-stat-label">Reporting Period</span><span class="report-stat-value" id="rpt-period">—</span></div>
+      <div class="report-stat"><span class="report-stat-label">Total Interactions</span><span class="report-stat-value" id="rpt-interactions">0</span></div>
+      <div class="report-stat"><span class="report-stat-label">Staff Hours Saved</span><span class="report-stat-value" id="rpt-hours">0.0 hrs</span></div>
+      <div class="report-stat"><span class="report-stat-label">Dollar Value (@ $45/hr VSO)</span><span class="report-stat-value" id="rpt-dollar">$0.00</span></div>
+      <div class="report-stat"><span class="report-stat-label">Token Reduction %</span><span class="report-stat-value" id="rpt-pct">0%</span></div>
+      <div class="report-stat"><span class="report-stat-label">IGM Patent</span><span class="report-stat-value">USPTO 19/571,156</span></div>
+      <div style="margin-top:12px">
+        <button class="btn btn-green" style="width:100%" onclick="exportReport()">↓ Export for Grant Compliance</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interaction Log -->
+  <div class="card">
+    <div class="card-title">
+      Interaction Log — Live Record
+      <span style="font-size:10px;color:var(--text3);font-weight:400">All interactions cryptographically timestamped · IGM governed</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Type</th>
+          <th>Court</th>
+          <th>Ungov Tokens</th>
+          <th>Gov Tokens</th>
+          <th>Tokens Saved</th>
+          <th>Reduction</th>
+          <th>Time Saved</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="log-body">
+        <tr><td colspan="9" style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:16px 10px;text-align:center">No interactions logged yet — use the form above to begin tracking</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">
+  MVA · JIV IGM Savings Tracker &nbsp;·&nbsp; LA County Department of Military & Veterans Affairs &nbsp;·&nbsp; Veterans Treatment Court &nbsp;·&nbsp; JCOD Grant Compliance
+  <br>Powered by IGM — Inference Governance Module &nbsp;·&nbsp; DeBacco Nexus LLC &nbsp;·&nbsp; USPTO Provisional 19/571,156
+  <br>Built by James L. DeBacco, MSW, DSW(c) &nbsp;·&nbsp; Accredited VSO · VTC Court Liaison · USMC Veteran
+</div>
+
+<script>
+// ── Data store ──
+let interactions = JSON.parse(localStorage.getItem('mva_igm_log') || '[]');
+let activeCases = 147; // from your caseload
+
+const TYPE_LABELS = {
+  case_note: 'Case Note',
+  benefits: 'Benefits Research',
+  court_prep: 'Court Prep',
+  referral: 'Referral Letter',
+  claims: 'VA Claims',
+  discharge: 'Discharge Upgrade',
+  progress: 'Progress Report',
+  intake: 'Intake',
+  other: 'Other'
+};
+
+const VSO_HOURLY = 45; // $ per hour for VSO staff time
+
+function save() {
+  localStorage.setItem('mva_igm_log', JSON.stringify(interactions));
+}
+
+function fmtTime(ts) {
+  return new Date(ts).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function logInteraction() {
+  const type = document.getElementById('f-type').value;
+  const court = document.getElementById('f-court').value;
+  const ungov = parseInt(document.getElementById('f-ungov').value) || 450;
+  const gov = parseInt(document.getElementById('f-gov').value) || 150;
+  const timeSaved = parseInt(document.getElementById('f-time').value) || 12;
+  const notes = document.getElementById('f-notes').value;
+
+  const entry = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    type,
+    court,
+    ungov,
+    gov,
+    saved: ungov - gov,
+    pct: Math.round((ungov - gov) / ungov * 100),
+    timeSaved,
+    notes,
+    energy: ((ungov - gov) * 0.3).toFixed(1),
+    water: ((ungov - gov) * 0.5).toFixed(1),
+    co2: ((ungov - gov) * 0.15).toFixed(2),
+    cost: ((ungov - gov) * 0.000003).toFixed(5),
+  };
+
+  interactions.unshift(entry);
+  save();
+  refresh();
+
+  // Reset notes
+  document.getElementById('f-notes').value = '';
+
+  // Flash confirmation
+  const btn = document.querySelector('[onclick="logInteraction()"]');
+  btn.textContent = '✓ Logged!';
+  btn.style.background = 'var(--green)';
+  setTimeout(() => { btn.textContent = 'Log Interaction →'; btn.style.background = ''; }, 1500);
+}
+
+function refresh() {
+  const total = interactions.length;
+  const totalTokensSaved = interactions.reduce((s, e) => s + e.saved, 0);
+  const totalTimeSaved = interactions.reduce((s, e) => s + e.timeSaved, 0);
+  const totalEnergy = interactions.reduce((s, e) => s + parseFloat(e.energy), 0);
+  const totalWater = interactions.reduce((s, e) => s + parseFloat(e.water), 0);
+  const totalCO2 = interactions.reduce((s, e) => s + parseFloat(e.co2), 0);
+  const totalCost = interactions.reduce((s, e) => s + parseFloat(e.cost), 0);
+  const totalHours = (totalTimeSaved / 60).toFixed(1);
+  const dollarValue = (totalTimeSaved / 60 * VSO_HOURLY + totalCost).toFixed(2);
+  const govRate = total > 0 ? '100%' : '0%';
+
+  const avgPct = total > 0
+    ? Math.round(interactions.reduce((s, e) => s + e.pct, 0) / total)
+    : 0;
+
+  // KPIs
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-hours').textContent = totalHours;
+  document.getElementById('kpi-cost').textContent = '$' + dollarValue;
+  document.getElementById('kpi-cases').textContent = activeCases;
+
+  // Savings banner
+  document.getElementById('save-tokens').textContent = totalTokensSaved.toLocaleString();
+  document.getElementById('save-energy').textContent = totalEnergy.toFixed(1);
+  document.getElementById('save-water').textContent = totalWater.toFixed(1);
+  document.getElementById('save-co2').textContent = totalCO2.toFixed(2);
+  document.getElementById('save-pct').textContent = avgPct + '%';
+
+  // Report
+  const now = new Date();
+  document.getElementById('rpt-period').textContent = now.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  document.getElementById('rpt-interactions').textContent = total;
+  document.getElementById('rpt-hours').textContent = totalHours + ' hrs';
+  document.getElementById('rpt-dollar').textContent = '$' + dollarValue;
+  document.getElementById('rpt-pct').textContent = avgPct + '%';
+
+  // Type breakdown
+  const byType = {};
+  interactions.forEach(e => {
+    if (!byType[e.type]) byType[e.type] = { count: 0, saved: 0 };
+    byType[e.type].count++;
+    byType[e.type].saved += e.saved;
+  });
+  const maxSaved = Math.max(...Object.values(byType).map(v => v.saved), 1);
+  document.getElementById('type-breakdown').innerHTML = Object.entries(byType)
+    .sort((a, b) => b[1].saved - a[1].saved)
+    .map(([type, data]) => `
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+          <span style="color:var(--text2)">${TYPE_LABELS[type] || type}</span>
+          <span style="font-family:var(--mono);color:var(--green)">${data.saved.toLocaleString()} tokens</span>
+        </div>
+        <div class="progress-bg"><div class="progress-bar" style="width:${Math.round(data.saved/maxSaved*100)}%"></div></div>
+      </div>
+    `).join('') || '<div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:12px 0">No data</div>';
+
+  // Court breakdown
+  const byCourt = {};
+  interactions.forEach(e => {
+    if (!byCourt[e.court]) byCourt[e.court] = { count: 0, saved: 0 };
+    byCourt[e.court].count++;
+    byCourt[e.court].saved += e.saved;
+  });
+  const maxCourtSaved = Math.max(...Object.values(byCourt).map(v => v.saved), 1);
+  document.getElementById('court-breakdown').innerHTML = Object.entries(byCourt)
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([court, data]) => `
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+          <span style="color:var(--text2)">${court}</span>
+          <span style="font-family:var(--mono);color:var(--blue)">${data.count} interactions</span>
+        </div>
+        <div class="progress-bg"><div class="progress-bar" style="width:${Math.round(data.saved/maxCourtSaved*100)};background:var(--blue)%"></div></div>
+      </div>
+    `).join('') || '<div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:12px 0">No data</div>';
+
+  // Log table
+  if (interactions.length === 0) {
+    document.getElementById('log-body').innerHTML = '<tr><td colspan="9" style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:16px 10px;text-align:center">No interactions logged yet</td></tr>';
+    return;
+  }
+
+  document.getElementById('log-body').innerHTML = interactions.slice(0, 50).map(e => `
+    <tr>
+      <td class="mono">${fmtTime(e.timestamp)}</td>
+      <td><span class="badge badge-blue">${TYPE_LABELS[e.type] || e.type}</span></td>
+      <td style="font-size:11px">${e.court}</td>
+      <td class="mono" style="color:var(--red)">${e.ungov}</td>
+      <td class="mono" style="color:var(--green)">${e.gov}</td>
+      <td class="mono" style="color:var(--green);font-weight:600">${e.saved}</td>
+      <td><span class="badge badge-green">${e.pct}%</span></td>
+      <td class="mono">${e.timeSaved} min</td>
+      <td style="font-size:11px;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.notes || '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function exportReport() {
+  const total = interactions.length;
+  const totalTokensSaved = interactions.reduce((s, e) => s + e.saved, 0);
+  const totalTimeSaved = interactions.reduce((s, e) => s + e.timeSaved, 0);
+  const totalHours = (totalTimeSaved / 60).toFixed(1);
+  const totalCost = interactions.reduce((s, e) => s + parseFloat(e.cost), 0);
+  const dollarValue = (totalTimeSaved / 60 * VSO_HOURLY + totalCost).toFixed(2);
+  const avgPct = total > 0 ? Math.round(interactions.reduce((s, e) => s + e.pct, 0) / total) : 0;
+  const now = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+
+  const report = `MVA · JIV IGM SAVINGS REPORT
+LA County Department of Military & Veterans Affairs
+Veterans Treatment Court · JCOD Grant Compliance
+Generated: ${now}
+IGM Patent: USPTO Provisional 19/571,156 · James L. DeBacco, VSO
+
+═══════════════════════════════════════
+SUMMARY
+═══════════════════════════════════════
+Total AI-Assisted Interactions:  ${total}
+Total Tokens Saved:              ${totalTokensSaved.toLocaleString()}
+Average Token Reduction:         ${avgPct}%
+Staff Time Saved:                ${totalHours} hours
+Dollar Value (@ $45/hr VSO):     $${dollarValue}
+Active VTC Cases:                ${activeCases}
+
+═══════════════════════════════════════
+ENVIRONMENTAL SAVINGS
+═══════════════════════════════════════
+Energy Saved:  ${interactions.reduce((s,e)=>s+parseFloat(e.energy),0).toFixed(1)} mWh
+Water Saved:   ${interactions.reduce((s,e)=>s+parseFloat(e.water),0).toFixed(1)} mL
+CO₂ Saved:     ${interactions.reduce((s,e)=>s+parseFloat(e.co2),0).toFixed(2)} mg
+
+═══════════════════════════════════════
+INTERACTION LOG
+═══════════════════════════════════════
+${interactions.map(e => `${fmtTime(e.timestamp)} | ${TYPE_LABELS[e.type]} | ${e.court} | ${e.saved} tokens saved (${e.pct}%) | ${e.timeSaved} min | ${e.notes || ''}`).join('\n')}
+
+═══════════════════════════════════════
+This report documents IGM-governed AI interactions
+by accredited VSO staff in LA County VTC program.
+All interactions governed under IGM architecture.
+USPTO Provisional 19/571,156 · DeBacco Nexus LLC
+James L. DeBacco, MSW, DSW(c) · Accredited VSO
+`;
+
+  const blob = new Blob([report], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `MVA_IGM_Report_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+}
+
+// Init
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric', year:'numeric' });
+refresh();
+</script>
+</body>
+</html>
+

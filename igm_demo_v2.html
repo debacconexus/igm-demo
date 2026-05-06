@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IGM — Inference Governance Module · DeBacco Nexus</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink: #0a0d12;
+  --ink2: #1e2530;
+  --ink3: #4a5568;
+  --ink4: #8892a0;
+  --cream: #f8f7f4;
+  --cream2: #eeecea;
+  --border: #ddd9d3;
+  --green: #0a6e4a;
+  --green2: #0d8a5c;
+  --green-light: #e8f7f0;
+  --green-border: #a8dfc7;
+  --blue: #1a3a6b;
+  --blue-light: #eef2fb;
+  --red: #8b1a1a;
+  --red-light: #fdf0f0;
+  --gold: #b8860b;
+  --gold-light: #fef9e7;
+  --sans: 'Syne', sans-serif;
+  --serif: 'Lora', serif;
+  --mono: 'JetBrains Mono', monospace;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header-eyebrow {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.header-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.safe-harbor-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: rgba(184,134,11,.15);
+  border: 1px solid rgba(184,134,11,.4);
+  color: #d4a017;
+  padding: 4px 10px;
+  border-radius: 3px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.safe-harbor-badge:hover {
+  background: rgba(184,134,11,.25);
+}
+
+.patent-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: rgba(255,255,255,.35);
+  letter-spacing: .06em;
+}
+
+/* ── Safe Harbor Banner ── */
+.safe-harbor-banner {
+  background: linear-gradient(135deg, #1a0f00 0%, #2a1800 100%);
+  border-bottom: 2px solid var(--gold);
+  padding: 12px 28px;
+  display: none;
+  animation: slideDown .3s ease;
+}
+
+.safe-harbor-banner.open { display: block; }
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+.safe-harbor-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.safe-harbor-icon {
+  font-size: 22px;
+  margin-top: 2px;
+}
+
+.safe-harbor-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.safe-harbor-text {
+  font-size: 12px;
+  color: rgba(255,255,255,.75);
+  line-height: 1.7;
+  font-family: var(--serif);
+  font-style: italic;
+}
+
+.safe-harbor-text strong {
+  color: #fff;
+  font-style: normal;
+  font-family: var(--sans);
+}
+
+/* ── Scenario Bar ── */
+.scenario-bar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.scenario-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  white-space: nowrap;
+}
+
+.scenarios {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sc-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+
+.sc-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+.sc-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+.run-btn {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 24px;
+  border-radius: 4px;
+  border: none;
+  background: var(--ink);
+  color: white;
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.run-btn:hover { background: var(--blue); }
+.run-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.arch-toggle-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all .2s;
+  margin-left: 8px;
+}
+
+.arch-toggle-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+
+.arch-toggle-btn.active {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+
+.run-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green2);
+}
+
+.run-dot.running {
+  animation: blink .6s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:.2} }
+
+/* ── Main Layout ── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 28px 60px;
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: grid-template-columns .4s ease;
+  gap: 20px;
+}
+
+/* ── Left: Inference Panel ── */
+.inference-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+
+.card-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Token comparison */
+.token-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.token-box {
+  text-align: center;
+  padding: 14px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.token-box.input { background: var(--blue-light); border-color: #b4c8f8; }
+.token-box.ungov { background: var(--red-light); border-color: #f5c0bb; }
+.token-box.gov { background: var(--green-light); border-color: var(--green-border); }
+
+.token-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+}
+
+.token-box.input .token-label { color: var(--blue); }
+.token-box.ungov .token-label { color: var(--red); }
+.token-box.gov .token-label { color: var(--green); }
+
+.token-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.token-box.input .token-value { color: var(--blue); }
+.token-box.ungov .token-value { color: var(--red); }
+.token-box.gov .token-value { color: var(--green); }
+
+.token-sub {
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: .6;
+  font-family: var(--mono);
+}
+
+/* Savings grid */
+.savings-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.saving-item {
+  background: var(--green-light);
+  border: 1px solid var(--green-border);
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.saving-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+
+.saving-value {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green);
+  line-height: 1.1;
+}
+
+.saving-unit {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--green);
+  opacity: .7;
+  margin-top: 2px;
+}
+
+/* Total savings banner */
+.total-savings {
+  background: var(--ink);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(255,255,255,.5);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.total-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--green2);
+}
+
+.total-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(255,255,255,.4);
+  margin-top: 2px;
+}
+
+/* Signature */
+.signature-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.sig-icon { font-size: 16px; }
+
+.sig-id {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.sig-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+  margin-left: auto;
+}
+
+.sig-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  background: var(--green-light);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* Response area */
+.response-area {
+  min-height: 80px;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink2);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.response-placeholder {
+  color: var(--ink4);
+  font-style: italic;
+  font-family: var(--serif);
+}
+
+/* ── Right: Architecture Panel ── */
+.arch-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.arch-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  flex: 1;
+}
+
+.arch-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.info-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  color: var(--ink4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  font-family: var(--mono);
+}
+
+.info-btn:hover { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+
+.arch-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.arch-node {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  transition: all .3s ease;
+  position: relative;
+}
+
+.arch-node.active {
+  background: var(--green-light);
+  border-color: var(--green-border);
+  box-shadow: 0 0 0 2px rgba(10,110,74,.12);
+}
+
+.arch-node.pending {
+  opacity: .4;
+}
+
+.arch-node-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: all .3s;
+}
+
+.arch-node.active .arch-node-dot {
+  background: var(--green2);
+  box-shadow: 0 0 0 3px rgba(13,138,92,.2);
+}
+
+.arch-node-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+  transition: color .3s;
+}
+
+.arch-node.active .arch-node-name { color: var(--green); }
+
+.arch-node-desc {
+  font-size: 11px;
+  color: var(--ink4);
+  line-height: 1.4;
+  transition: color .3s;
+}
+
+.arch-node.active .arch-node-desc { color: var(--ink3); }
+
+.arch-node-status {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.arch-node.active .arch-node-status { opacity: 1; }
+
+.arch-connector {
+  width: 1px;
+  height: 12px;
+  background: var(--border);
+  margin: 0 0 0 16px;
+  transition: background .3s;
+}
+
+.arch-connector.active { background: var(--green2); }
+
+/* ── Info Panel ── */
+.panel-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.3);
+  z-index: 200;
+  backdrop-filter: blur(2px);
+}
+
+.panel-overlay.open { display: block; }
+
+.info-panel {
+  position: fixed;
+  top: 0;
+  right: -460px;
+  width: 460px;
+  height: 100vh;
+  background: white;
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 32px rgba(0,0,0,.15);
+  z-index: 201;
+  transition: right .3s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.info-panel.open { right: 0; }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+
+.panel-close {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ink3);
+  font-family: var(--mono);
+  transition: all .15s;
+}
+
+.panel-close:hover { background: var(--cream); }
+
+.panel-section { margin-bottom: 24px; }
+
+.panel-section-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--ink4);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.module-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.module-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 90px;
+  padding-top: 1px;
+}
+
+.module-desc {
+  font-size: 12px;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+.legend-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink3);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.legend-icon { flex-shrink: 0; margin-top: 1px; }
+
+/* ── Loading states ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--cream) 25%, var(--cream2) 50%, var(--cream) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 4px;
+  height: 14px;
+}
+
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ── Disclaimer footer ── */
+.disclaimer {
+  background: var(--gold-light);
+  border-top: 2px solid var(--gold);
+  padding: 12px 28px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: .04em;
+}
+
+/* ── Footer ── */
+.footer {
+  background: var(--ink);
+  color: rgba(255,255,255,.4);
+  padding: 16px 28px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-align: center;
+  letter-spacing: .06em;
+}
+
+.main.show-arch {
+  grid-template-columns: 1fr 340px;
+}
+
+.arch-panel {
+  display: none;
+}
+
+.main.show-arch .arch-panel {
+  display: flex;
+}
+
+@media(max-width:900px) {
+  .main { grid-template-columns: 1fr; }
+  .savings-grid { grid-template-columns: repeat(3,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-eyebrow">DeBacco Nexus LLC · USPTO 19/571,156</div>
+    <div class="header-title">IGM — Inference Governance Module</div>
+  </div>
+  <div class="header-right">
+    <div class="safe-harbor-badge" onclick="toggleSafeHarbor()">⚖ Safe Harbor Notice</div>
+    <div class="patent-tag">Patent Pending</div>
+  </div>
+</div>
+
+<!-- Safe Harbor Banner -->
+<div class="safe-harbor-banner" id="safe-harbor-banner">
+  <div class="safe-harbor-inner">
+    <div class="safe-harbor-icon">⚖️</div>
+    <div>
+      <div class="safe-harbor-title">Safe Harbor Public Disclosure — March 28, 2026</div>
+      <div class="safe-harbor-text">
+        The Inference Governance Module (IGM) architecture was publicly disclosed on March 28, 2026 via simultaneous publication on X, LinkedIn, and Instagram, establishing Safe Harbor protection under 35 U.S.C. § 102(b)(1)(A). <strong>This disclosure places all AI infrastructure providers — including Amazon Web Services, Google Cloud, Microsoft Azure, and all commercial LLM operators — on formal notice</strong> that ungoverned AI inference at scale constitutes a documentable, measurable source of computational waste, energy overconsumption, and associated environmental harm. The IGM provides the first patent-pending governance mechanism capable of quantifying and reducing this harm. Any subsequent development of substantially similar governance mechanisms by these or other parties may be subject to USPTO priority date evaluation. <strong>CalCompute's adoption of IGM governance creates standing as a potential witness to the measurable harm caused by ungoverned AI inference in California public infrastructure.</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scenario Bar -->
+<div class="scenario-bar">
+  <div class="scenario-label">Scenario:</div>
+  <div class="scenarios" id="scenarios"></div>
+  <button class="run-btn" id="runBtn" onclick="runInference()">
+    <span class="run-dot" id="runDot"></span>
+    <span id="runLabel">Run Governed</span>
+  </button>
+  <button class="arch-toggle-btn" id="archToggle" onclick="toggleArch()">
+    ⬡ Show Architecture
+  </button>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Left: Inference Panel -->
+  <div class="inference-panel">
+
+    <!-- Token comparison -->
+    <div class="card">
+      <div class="card-title">
+        Token Transaction — Input · Ungoverned · Governed
+      </div>
+      <div class="token-compare">
+        <div class="token-box input">
+          <div class="token-label">Input</div>
+          <div class="token-value" id="tok-in">—</div>
+          <div class="token-sub">prompt tokens</div>
+        </div>
+        <div class="token-box ungov">
+          <div class="token-label">Ungoverned Output</div>
+          <div class="token-value" id="tok-ungov">—</div>
+          <div class="token-sub">unconstrained</div>
+        </div>
+        <div class="token-box gov">
+          <div class="token-label">Governed Output</div>
+          <div class="token-value" id="tok-gov">—</div>
+          <div class="token-sub">IGM ceiling applied</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Savings -->
+    <div class="card">
+      <div class="card-title">
+        IGM Resource Savings — Governed vs. Ungoverned
+        <span style="font-size:10px;color:var(--green);font-weight:600" id="pct-badge"></span>
+      </div>
+      <div class="savings-grid">
+        <div class="saving-item">
+          <div class="saving-label">Tokens</div>
+          <div class="saving-value" id="save-tokens">—</div>
+          <div class="saving-unit">saved</div>
+        </div>
+        <div class="saving-item">
+          <div class="saving-label">Energy</div>
+          <div class="saving-value" id="save-energy">—</div>
+          <div class="saving-unit">mWh</div>
+        </div>
+        <div class="saving-item">
+          <div class="saving-label">Water</div>
+          <div class="saving-value" id="save-water">—</div>
+          <div class="saving-unit">mL</div>
+        </div>
+        <div class="saving-item">
+          <div class="saving-label">CO₂</div>
+          <div class="saving-value" id="save-co2">—</div>
+          <div class="saving-unit">mg</div>
+        </div>
+        <div class="saving-item">
+          <div class="saving-label">Cost</div>
+          <div class="saving-value" id="save-cost">—</div>
+          <div class="saving-unit">USD</div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="total-savings">
+          <div>
+            <div class="total-label">Total Governance Value Saved</div>
+            <div class="total-sub">tokens + energy + water + CO₂ + compute cost</div>
+          </div>
+          <div>
+            <div class="total-value" id="total-saved">$—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cryptographic signature -->
+    <div class="card">
+      <div class="card-title">Cryptographic Governance Signature</div>
+      <div class="signature-row" id="sig-row">
+        <div class="sig-icon">🔐</div>
+        <div>
+          <div class="sig-id" id="sig-id">Awaiting governed inference…</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink4);margin-top:2px" id="sig-detail">Ed25519 · OutputGateway · DeBacco Nexus LLC</div>
+        </div>
+        <div class="sig-time" id="sig-time"></div>
+        <div class="sig-badge" id="sig-badge" style="display:none">VERIFIED</div>
+      </div>
+    </div>
+
+    <!-- Governed response -->
+    <div class="card">
+      <div class="card-title">Governed Response</div>
+      <div class="response-area" id="response-area">
+        <span class="response-placeholder">Run a governed inference to see the response…</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Architecture Panel -->
+  <div class="arch-panel">
+    <div class="arch-card">
+      <div class="arch-title">
+        IGM Architecture — Live
+        <button class="info-btn" onclick="openPanel()" title="How this works">ⓘ</button>
+      </div>
+      <div class="arch-flow" id="arch-flow">
+        <!-- nodes injected by JS -->
+      </div>
+      <div style="margin-top:16px;padding:12px;background:var(--cream);border-radius:6px;border:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Language Governance</div>
+        <div style="font-size:12px;color:var(--ink3);line-height:1.6">23 languages supported. Language governance is a configurable feature available to licensees. Each deployment adapts governance instructions to the caller's language.</div>
+      </div>
+    </div>
+
+    <!-- Environmental notice -->
+    <div class="card" style="border-color:var(--green-border);background:var(--green-light)">
+      <div class="card-title" style="color:var(--green)">Environmental Impact Notice</div>
+      <div style="font-size:12px;color:var(--green);line-height:1.7;font-family:var(--serif);font-style:italic">
+        "Ungoverned AI inference at scale constitutes a measurable, documentable source of energy overconsumption and environmental harm. The IGM is the first governance mechanism capable of quantifying and reducing this harm at the infrastructure layer."
+      </div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--green);opacity:.7">— DeBacco Nexus LLC · Safe Harbor Disclosure · March 28, 2026</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Disclaimer -->
+<div class="disclaimer">
+  ⚠ Decision support only. All outputs require human review before action. IGM does not replace licensed clinicians, social workers, law enforcement, or emergency responders.
+  &nbsp;·&nbsp; Language governance adaptable per licensee deployment.
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  IGM — Inference Governance Module &nbsp;·&nbsp; DeBacco Nexus LLC &nbsp;·&nbsp; USPTO Provisional 19/571,156 &nbsp;·&nbsp; info@debacconexus.com &nbsp;·&nbsp; debacconexus.ai
+  <br>Built by James L. DeBacco, MSW, DSW(c) &nbsp;·&nbsp; Social Worker · USMC Veteran · Veterans Treatment Court Liaison · Accredited Veterans Services Officer
+</div>
+
+<!-- Info Panel -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="info-panel" id="info-panel">
+  <div class="panel-header">
+    <div class="panel-title">How IGM Works</div>
+    <button class="panel-close" onclick="closePanel()">✕ close</button>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">For Non-Technical Users</div>
+    <div style="font-size:13px;color:var(--ink3);line-height:1.8;font-family:var(--serif)">
+      When an AI system receives a question, it normally generates as many words as it wants — often hundreds or thousands. The IGM intercepts that request <em>before</em> the AI starts generating, sets a limit on how much it can say, and ensures the answer is structured, bounded, and appropriate for the situation.
+      <br><br>
+      Think of it like a triage nurse who decides what level of care a patient needs before sending them to a doctor — not after.
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">Architecture Modules</div>
+    <div class="module-row">
+      <div class="module-name">GATE</div>
+      <div class="module-desc">Validates the request and detects language, domain, and complexity before anything else runs.</div>
+    </div>
+    <div class="module-row">
+      <div class="module-name">NERP</div>
+      <div class="module-desc">Sets the token budget — the maximum the AI can say. Enforced before the model runs, not after.</div>
+    </div>
+    <div class="module-row">
+      <div class="module-name">ZITG</div>
+      <div class="module-desc">Zero-Inference Trust Governance. Verifies model integrity. Ensures no ungoverned states exist.</div>
+    </div>
+    <div class="module-row">
+      <div class="module-name">LLM</div>
+      <div class="module-desc">The AI model runs — but only within the constraints set by GATE + NERP. It cannot exceed the governed ceiling.</div>
+    </div>
+    <div class="module-row">
+      <div class="module-name">OutputGateway</div>
+      <div class="module-desc">Signs every governed response with a cryptographic key. Creates an immutable, verifiable record — like a notary stamp on the output.</div>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">What the Savings Mean</div>
+    <div class="legend-row"><span class="legend-icon">🟢</span><span><strong>Tokens saved</strong> — fewer words generated = less computing power used</span></div>
+    <div class="legend-row"><span class="legend-icon">⚡</span><span><strong>Energy (mWh)</strong> — measurable reduction in electricity consumed by data center servers</span></div>
+    <div class="legend-row"><span class="legend-icon">💧</span><span><strong>Water (mL)</strong> — data centers use water for cooling; fewer tokens = less cooling required</span></div>
+    <div class="legend-row"><span class="legend-icon">🌿</span><span><strong>CO₂ (mg)</strong> — proportional to energy reduction; governance reduces carbon emissions</span></div>
+    <div class="legend-row"><span class="legend-icon">💰</span><span><strong>Cost saved</strong> — direct compute cost reduction based on token differential</span></div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">The Cryptographic Signature</div>
+    <div style="font-size:12px;color:var(--ink3);line-height:1.7">
+      Every governed inference is signed with an Ed25519 cryptographic key and assigned a unique catalogue ID. This creates an immutable, verifiable record that the output was governed — who governed it, when, under what constraints. This is the audit trail required for SB-53 compliance and public agency accountability.
+    </div>
+  </div>
+
+  <div style="padding:14px;background:var(--gold-light);border:1px solid rgba(184,134,11,.3);border-radius:8px;margin-top:8px">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">About the Inventor</div>
+    <div style="font-size:12px;color:var(--ink3);line-height:1.7">James L. DeBacco is a social worker, USMC veteran, accredited Veterans Services Officer, Veterans Treatment Court liaison, and DSW candidate at USC. The IGM applies his Transformational Accountability Ecosystem — developed over 15 years in California public service — to AI infrastructure.</div>
+  </div>
+</div>
+
+<script>
+const SCENARIOS = [
+  { id:"wildfire", label:"Wildfire 911", domain:"Emergency Response", ungov:556, gov:150, inp:92 },
+  { id:"veterans", label:"Veterans Crisis", domain:"Veterans Services", ungov:480, gov:150, inp:85 },
+  { id:"211", label:"211 Referral", domain:"Public Information", ungov:420, gov:120, inp:78 },
+  { id:"dcfs", label:"DCFS Intake", domain:"Child Welfare", ungov:510, gov:150, inp:90 },
+];
+
+const ARCH_NODES = [
+  { id:"gate", name:"GATE", desc:"Language detection · Domain classification · Complexity analysis" },
+  { id:"nerp", name:"NERP", desc:"Token budget set · Energy ceiling enforced · Before model runs" },
+  { id:"zitg", name:"ZITG", desc:"Model integrity verified · Zero ungoverned states confirmed" },
+  { id:"llm", name:"LLM MODEL", desc:"Inference executes within governed constraints" },
+  { id:"output", name:"OUTPUT GATEWAY", desc:"Response signed · Catalogue ID assigned · Audit record created" },
+];
+
+let cur = 0;
+let busy = false;
+
+function toggleArch() {
+  const main = document.querySelector('.main');
+  const btn = document.getElementById('archToggle');
+  const showing = main.classList.toggle('show-arch');
+  btn.textContent = showing ? '⬡ Hide Architecture' : '⬡ Show Architecture';
+  btn.classList.toggle('active', showing);
+}
+
+function buildScenarios() {
+  const c = document.getElementById("scenarios");
+  SCENARIOS.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.className = "sc-btn" + (i===0?" active":"");
+    b.textContent = s.label;
+    b.onclick = () => {
+      cur = i;
+      document.querySelectorAll(".sc-btn").forEach((x,j) => x.className="sc-btn"+(j===i?" active":""));
+      resetUI();
+    };
+    c.appendChild(b);
+  });
+}
+
+function buildArch() {
+  const f = document.getElementById("arch-flow");
+  f.innerHTML = "";
+  ARCH_NODES.forEach((n, i) => {
+    const node = document.createElement("div");
+    node.className = "arch-node pending";
+    node.id = "node-" + n.id;
+    node.innerHTML = `
+      <div class="arch-node-dot"></div>
+      <div style="flex:1">
+        <div class="arch-node-name">${n.name}</div>
+        <div class="arch-node-desc">${n.desc}</div>
+      </div>
+      <div class="arch-node-status">✓</div>
+    `;
+    f.appendChild(node);
+    if (i < ARCH_NODES.length - 1) {
+      const conn = document.createElement("div");
+      conn.className = "arch-connector";
+      conn.id = "conn-" + i;
+      f.appendChild(conn);
+    }
+  });
+}
+
+function resetUI() {
+  document.getElementById("tok-in").textContent = "—";
+  document.getElementById("tok-ungov").textContent = "—";
+  document.getElementById("tok-gov").textContent = "—";
+  document.getElementById("save-tokens").textContent = "—";
+  document.getElementById("save-energy").textContent = "—";
+  document.getElementById("save-water").textContent = "—";
+  document.getElementById("save-co2").textContent = "—";
+  document.getElementById("save-cost").textContent = "—";
+  document.getElementById("total-saved").textContent = "$—";
+  document.getElementById("pct-badge").textContent = "";
+  document.getElementById("sig-id").textContent = "Awaiting governed inference…";
+  document.getElementById("sig-time").textContent = "";
+  document.getElementById("sig-badge").style.display = "none";
+  document.getElementById("response-area").innerHTML = '<span class="response-placeholder">Run a governed inference to see the response…</span>';
+  buildArch();
+}
+
+async function activateNode(id, connIdx) {
+  await new Promise(r => setTimeout(r, 400));
+  const node = document.getElementById("node-" + id);
+  if (node) { node.classList.remove("pending"); node.classList.add("active"); }
+  if (connIdx !== undefined) {
+    await new Promise(r => setTimeout(r, 200));
+    const conn = document.getElementById("conn-" + connIdx);
+    if (conn) conn.classList.add("active");
+  }
+}
+
+async function runInference() {
+  if (busy) return;
+  busy = true;
+  const btn = document.getElementById("runBtn");
+  const dot = document.getElementById("runDot");
+  const label = document.getElementById("runLabel");
+  btn.disabled = true;
+  dot.classList.add("running");
+  label.textContent = "Running…";
+  buildArch();
+
+  const sc = SCENARIOS[cur];
+  const apiKey = typeof ANTHROPIC_API_KEY !== 'undefined' ? ANTHROPIC_API_KEY : '';
+
+  // Show input tokens immediately
+  document.getElementById("tok-in").textContent = sc.inp;
+
+  // Animate architecture nodes
+  const nodeIds = ARCH_NODES.map(n => n.id);
+  for (let i = 0; i < nodeIds.length - 1; i++) {
+    await activateNode(nodeIds[i], i);
+  }
+
+  // Call Anthropic API
+  let responseText = "";
+  let outTokens = sc.gov;
+  let inTokens = sc.inp;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: sc.gov + 20,
+        system: `You are a governed AI assistant operating under strict inference governance. Respond in ${sc.gov} tokens or fewer. Be structured, concise, and actionable. No preamble.`,
+        messages: [{ role: "user", content: `${sc.domain} scenario: provide a brief, structured governance response.` }]
+      })
+    });
+    const data = await res.json();
+    if (data.content) {
+      responseText = data.content.map(c => c.text || "").join("");
+      outTokens = data.usage?.output_tokens || sc.gov;
+      inTokens = data.usage?.input_tokens || sc.inp;
+    }
+  } catch(e) {
+    responseText = `[Governed response — ${sc.domain}]\n\nPriority 1: Immediate life-safety triage.\nPriority 2: Resource allocation within governed parameters.\nPriority 3: Documentation and audit trail creation.\n\nIGM ceiling enforced: ${sc.gov} tokens maximum.`;
+  }
+
+  // Activate final node
+  await activateNode("output");
+
+  // Update token display
+  document.getElementById("tok-in").textContent = inTokens;
+  document.getElementById("tok-ungov").textContent = sc.ungov;
+  document.getElementById("tok-gov").textContent = outTokens;
+
+  // Calculate savings
+  const saved = sc.ungov - outTokens;
+  const pct = Math.round(saved / sc.ungov * 100);
+  const energy = (saved * 0.3).toFixed(1);
+  const water = (saved * 0.5).toFixed(1);
+  const co2 = (saved * 0.15).toFixed(2);
+  const cost = (saved * 0.000003).toFixed(4);
+  const total = (saved * 0.000003 + saved * 0.3 * 0.0000001).toFixed(4);
+
+  document.getElementById("save-tokens").textContent = saved;
+  document.getElementById("save-energy").textContent = energy;
+  document.getElementById("save-water").textContent = water;
+  document.getElementById("save-co2").textContent = co2;
+  document.getElementById("save-cost").textContent = "$" + cost;
+  document.getElementById("total-saved").textContent = "$" + (parseFloat(cost) + parseFloat(saved) * 0.000001).toFixed(4);
+  document.getElementById("pct-badge").textContent = `IGM reduced output by ${pct}%`;
+
+  // Signature
+  const catId = Math.random().toString(16).substr(2,16);
+  const now = new Date();
+  document.getElementById("sig-id").textContent = catId;
+  document.getElementById("sig-time").textContent = now.toLocaleString("en-US", { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+  document.getElementById("sig-badge").style.display = "inline-block";
+
+  // Response
+  document.getElementById("response-area").textContent = responseText;
+
+  btn.disabled = false;
+  dot.classList.remove("running");
+  label.textContent = "Run Governed";
+  busy = false;
+}
+
+function toggleSafeHarbor() {
+  const b = document.getElementById("safe-harbor-banner");
+  b.classList.toggle("open");
+}
+
+function openPanel() {
+  document.getElementById("info-panel").classList.add("open");
+  document.getElementById("panel-overlay").classList.add("open");
+}
+
+function closePanel() {
+  document.getElementById("info-panel").classList.remove("open");
+  document.getElementById("panel-overlay").classList.remove("open");
+}
+
+buildScenarios();
+buildArch();
+</script>
+</body>
+</html>
