@@ -683,34 +683,52 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
         </div>
         <div class="off-ind" id="jiv-off-ind">Offline - saving locally, will sync when online</div>
       </div>
-      <div style="margin-bottom:14px">
-        <div class="report-box">
-          <div class="rpt-title">LA County Board of Supervisors &amp; Grant Funders</div>
-          <div class="rpt-subtitle">JIV · AI-Governed Veterans Impact Report</div>
-          <div class="rpt-highlights">
-            <div class="rpt-hl wellness">
-              <div class="rpt-hl-val" id="jiv-rpt-wellness">0</div>
-              <div class="rpt-hl-lbl">Veteran Wellness Seconds</div>
-            </div>
-            <div class="rpt-hl dollar">
-              <div class="rpt-hl-val" id="jiv-rpt-dollars">$0</div>
-              <div class="rpt-hl-lbl">Dollars Saved</div>
-            </div>
-            <div class="rpt-hl env">
-              <div class="rpt-hl-val" id="jiv-rpt-co2">0mg</div>
-              <div class="rpt-hl-lbl">CO₂ Reduced</div>
-            </div>
-            <div class="rpt-hl gov">
-              <div class="rpt-hl-val" id="jiv-rpt-pct">0%</div>
-              <div class="rpt-hl-lbl">Governed AI Rate</div>
-            </div>
+      <!-- Hidden rpt IDs so JS doesn't error -->
+      <span style="display:none" id="jiv-rpt-wellness"></span><span style="display:none" id="jiv-rpt-dollars"></span>
+      <span style="display:none" id="jiv-rpt-co2"></span><span style="display:none" id="jiv-rpt-pct"></span>
+      <span style="display:none" id="jiv-rpt-period"></span><span style="display:none" id="jiv-rpt-count"></span>
+      <span style="display:none" id="jiv-rpt-hours"></span><span style="display:none" id="jiv-rpt-energy"></span>
+      <span style="display:none" id="jiv-rpt-water"></span>
+
+      <!-- BIO PULSE + AI NOTES WIDGET -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+
+        <!-- BIO PULSE METER -->
+        <div style="background:linear-gradient(160deg,#0a1628,#1a2d4a);border:1px solid rgba(201,168,76,.25);border-radius:var(--rl2);padding:14px 16px;position:relative;overflow:hidden">
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(201,168,76,.7);text-transform:uppercase;letter-spacing:.13em;margin-bottom:4px">Staff Wellness</div>
+          <div style="font-size:13px;font-weight:700;color:white;margin-bottom:10px">Bio Pulse Check</div>
+          <!-- Animated pulse line -->
+          <div style="position:relative;height:44px;margin-bottom:10px;overflow:hidden">
+            <svg viewBox="0 0 280 44" style="width:100%;height:100%" id="jiv-pulse-svg">
+              <polyline id="jiv-pulse-line" points="0,22 280,22" fill="none" stroke="rgba(109,40,217,.3)" stroke-width="1.5"/>
+              <polyline id="jiv-pulse-active" points="" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle id="jiv-pulse-dot" cx="0" cy="22" r="3" fill="#c4b5fd"/>
+            </svg>
           </div>
-          <div class="rstat"><span class="rstat-l">Reporting Period</span><span class="rstat-v" id="jiv-rpt-period">--</span></div>
-          <div class="rstat"><span class="rstat-l">AI-Assisted Interactions</span><span class="rstat-v" id="jiv-rpt-count">0</span></div>
-          <div class="rstat"><span class="rstat-l">Hours Returned to Veterans</span><span class="rstat-v" id="jiv-rpt-hours">0.0 hrs</span></div>
-          <div class="rstat"><span class="rstat-l">Energy Saved</span><span class="rstat-v" id="jiv-rpt-energy">0 mWh</span></div>
-          <div class="rstat"><span class="rstat-l">Water Conserved</span><span class="rstat-v" id="jiv-rpt-water">0 mL</span></div>
-          <div style="margin-top:10px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
+          <!-- Rate buttons -->
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">How are you feeling right now?</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px" id="jiv-pulse-btns">
+            <button onclick="setPulse('jiv',1)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer" title="Overwhelmed">😰</button>
+            <button onclick="setPulse('jiv',2)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer" title="Drained">😔</button>
+            <button onclick="setPulse('jiv',3)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer" title="Steady">😐</button>
+            <button onclick="setPulse('jiv',4)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer" title="Good">🙂</button>
+            <button onclick="setPulse('jiv',5)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer" title="Energized">😊</button>
+          </div>
+          <div id="jiv-pulse-result" style="font-family:var(--mono);font-size:10px;color:#c4b5fd;min-height:28px;line-height:1.5;text-align:center;font-style:italic"></div>
+        </div>
+
+        <!-- AI FREE NOTES BOT -->
+        <div style="background:white;border:1px solid var(--border);border-radius:var(--rl2);padding:14px 16px;display:flex;flex-direction:column">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:4px">AI Assistant</div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">Free Notes Bot</div>
+          <div id="jiv-bot-history" style="flex:1;min-height:80px;max-height:120px;overflow-y:auto;margin-bottom:8px;display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;padding:16px 0">Ask me anything about this case…</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input id="jiv-bot-input" type="text" placeholder="Draft a note, summarize, ask…" style="flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);outline:none" onkeydown="if(event.key==='Enter')sendBotMsg('jiv')"/>
+            <button onclick="sendBotMsg('jiv')" style="background:var(--navy);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer">➤</button>
+          </div>
+          <div id="jiv-bot-spinner" style="display:none;font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-top:4px">Thinking…</div>
         </div>
       </div>
       <div class="card">
@@ -848,6 +866,41 @@ body{background:linear-gradient(135deg,#0a1628 0%,#1a2d4a 60%,#0a1628 100%);min-
           <div class="rstat"><span class="rstat-l">Energy Saved</span><span class="rstat-v" id="vet-rpt-energy">0 mWh</span></div>
           <div class="rstat"><span class="rstat-l">Water Conserved</span><span class="rstat-v" id="vet-rpt-water">0 mL</span></div>
           <div style="margin-top:10px"><a href="https://lacounty.sharepoint.com/:x:/r/teams/JIVTEAM/Shared%20Documents/JIV%20Team%20Sharedrive/Case%20Tracking/MVA%20Data%20Tracking/Veteran%20Case%20Tracking%20Spreadsheet%202025_Kenneth.xlsx?d=w3799ae43f64d4f489b4017c6ad808c52&csf=1&web=1&e=Sbvonq" target="_blank" style="display:block;width:100%;font-family:var(--mono);font-size:11px;padding:8px;border-radius:8px;border:none;background:var(--green);color:white;cursor:pointer;font-weight:600;text-decoration:none;text-align:center">📊 Open Live Spreadsheet</a></div>
+        </div>
+      </div>
+
+      <!-- BIO PULSE + AI NOTES BOT — VSR -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div style="background:linear-gradient(160deg,#0a1628,#1a2d4a);border:1px solid rgba(109,40,217,.3);border-radius:var(--rl2);padding:14px 16px;overflow:hidden">
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(196,181,253,.7);text-transform:uppercase;letter-spacing:.13em;margin-bottom:4px">Staff Wellness</div>
+          <div style="font-size:13px;font-weight:700;color:white;margin-bottom:10px">Bio Pulse Check</div>
+          <div style="position:relative;height:44px;margin-bottom:10px;overflow:hidden">
+            <svg viewBox="0 0 280 44" style="width:100%;height:100%">
+              <polyline id="vet-pulse-active" points="" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle id="vet-pulse-dot" cx="0" cy="22" r="3" fill="#c4b5fd"/>
+            </svg>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">How are you feeling right now?</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:10px">
+            <button onclick="setPulse('vet',1)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer">😰</button>
+            <button onclick="setPulse('vet',2)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer">😔</button>
+            <button onclick="setPulse('vet',3)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer">😐</button>
+            <button onclick="setPulse('vet',4)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer">🙂</button>
+            <button onclick="setPulse('vet',5)" style="font-size:17px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:5px;cursor:pointer">😊</button>
+          </div>
+          <div id="vet-pulse-result" style="font-family:var(--mono);font-size:10px;color:#c4b5fd;min-height:28px;line-height:1.5;text-align:center;font-style:italic"></div>
+        </div>
+        <div style="background:white;border:1px solid var(--border);border-radius:var(--rl2);padding:14px 16px;display:flex;flex-direction:column">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:4px">AI Assistant</div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">Free Notes Bot</div>
+          <div id="vet-bot-history" style="flex:1;min-height:80px;max-height:120px;overflow-y:auto;margin-bottom:8px;display:flex;flex-direction:column;gap:5px">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;padding:16px 0">Ask me anything about this case…</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input id="vet-bot-input" type="text" placeholder="Draft a note, summarize, ask…" style="flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);outline:none" onkeydown="if(event.key==='Enter')sendBotMsg('vet')"/>
+            <button onclick="sendBotMsg('vet')" style="background:var(--navy);color:white;border:none;border-radius:8px;padding:7px 12px;font-size:14px;cursor:pointer">➤</button>
+          </div>
+          <div id="vet-bot-spinner" style="display:none;font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center;margin-top:4px">Thinking…</div>
         </div>
       </div>
       <div class="card">
@@ -2150,5 +2203,85 @@ window.addEventListener('online', function() {
   updateOfflineUI('jiv'); updateOfflineUI('vet');
   syncOfflineQueue();
 });
+
+// ── BIO PULSE METER ────────────────────────────────────────
+var pulseResponses = {
+  1: ["You're carrying a lot right now. That matters. ✊", "Heavy caseloads take a toll. Please reach out to your supervisor.", "Your veterans need you — so does your own wellbeing. Take a breath."],
+  2: ["Feeling drained is valid in this work. You're not alone.", "Consider a short break before your next interaction.", "The compassion you bring costs something. Refill when you can."],
+  3: ["Steady is good. You're showing up. That counts.", "Consistent and present — exactly what your veterans need today.", "Balanced. Keep going — you've got this."],
+  4: ["Good energy today. Channel it into your cases. 💪", "You're in a strong place. Great day to make a difference.", "Positive and focused — your veterans will feel that."],
+  5: ["Energized and ready. Rare and valuable — use it well. 🌟", "At your best today. Go make an impact.", "Full tank. Your veterans are lucky to have you today."]
+};
+var pulsePoints = {jiv:[], vet:[]};
+function setPulse(r, val) {
+  var responses = pulseResponses[val];
+  var msg = responses[Math.floor(Math.random() * responses.length)];
+  document.getElementById(r + '-pulse-result').textContent = msg;
+  // Animate pulse line
+  var pts = pulsePoints[r];
+  var x = (pts.length * 18) % 280;
+  var baseY = 22;
+  var spike = val === 1 ? 38 : val === 2 ? 32 : val === 3 ? 22 : val === 4 ? 12 : 6;
+  pts.push([x - 6, baseY], [x - 3, spike], [x, baseY], [x + 3, baseY]);
+  if (pts.length > 30) pts = pts.slice(pts.length - 30);
+  pulsePoints[r] = pts;
+  var el = document.getElementById(r + '-pulse-active');
+  var dot = document.getElementById(r + '-pulse-dot');
+  if (el) {
+    el.setAttribute('points', pts.map(function(p){return p[0]+','+p[1];}).join(' '));
+  }
+  if (dot && pts.length) {
+    var last = pts[pts.length - 1];
+    dot.setAttribute('cx', last[0]);
+    dot.setAttribute('cy', last[1]);
+  }
+  // Trigger self-care if overwhelmed
+  if (val === 1) setTimeout(function(){ showSelfCare(); }, 1200);
+}
+
+// ── AI FREE NOTES BOT ──────────────────────────────────────
+function sendBotMsg(r) {
+  var input = document.getElementById(r + '-bot-input');
+  var history = document.getElementById(r + '-bot-history');
+  var spinner = document.getElementById(r + '-bot-spinner');
+  var msg = (input.value || '').trim();
+  if (!msg) return;
+  input.value = '';
+  // Add user bubble
+  var userDiv = document.createElement('div');
+  userDiv.style.cssText = 'align-self:flex-end;background:var(--navy);color:white;border-radius:10px 10px 2px 10px;padding:6px 10px;font-size:12px;max-width:90%;line-height:1.5';
+  userDiv.textContent = msg;
+  history.appendChild(userDiv);
+  history.scrollTop = history.scrollHeight;
+  spinner.style.display = 'block';
+  // Call Claude via proxy
+  fetch('/proxy/anthropic', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      model: 'claude-opus-4-5',
+      max_tokens: 300,
+      system: 'You are a concise AI assistant for LA County Military & Veterans Affairs VSO staff. Help draft case notes, summarize interactions, suggest referrals, or answer quick questions about veteran services. Be brief, professional, and compassionate. No more than 3 sentences unless a full note is requested.',
+      messages: [{role: 'user', content: msg}]
+    })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    spinner.style.display = 'none';
+    var text = (data.content && data.content[0] && data.content[0].text) ? data.content[0].text : 'Unable to reach AI. Check connection.';
+    var botDiv = document.createElement('div');
+    botDiv.style.cssText = 'align-self:flex-start;background:var(--bg);border:1px solid var(--border);border-radius:10px 10px 10px 2px;padding:6px 10px;font-size:12px;max-width:90%;line-height:1.5;color:var(--text)';
+    botDiv.textContent = text;
+    history.appendChild(botDiv);
+    history.scrollTop = history.scrollHeight;
+  })
+  .catch(function(){
+    spinner.style.display = 'none';
+    var errDiv = document.createElement('div');
+    errDiv.style.cssText = 'font-family:var(--mono);font-size:10px;color:var(--text3);text-align:center';
+    errDiv.textContent = 'Offline — AI unavailable';
+    history.appendChild(errDiv);
+  });
+}
 </script></body>
 </html>
